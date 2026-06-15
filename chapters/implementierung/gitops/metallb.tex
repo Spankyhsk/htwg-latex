@@ -1,0 +1,9 @@
+\subsubsection{MetalLB}
+MetalLB ist ein Loadbalancer, der dafür sorgt, dass Services eine stabile externe IP-Adresse haben.
+Damit fungiert MetalLB als Entry-Point des Clusters für Anwendungs-Traffic.
+Dadurch wird ein Single Point of Failure verhindert, da nicht ein einzelner Node als Entry-Point benutzt werden muss.
+MetalLB verteilt diesen Traffic auf mehrere Nodes.
+
+MetalLB und Traefik ergänzen sich dabei gegenseitig. 
+MetalLB dient als Eingangstür des Clusters, während Traefik den Flur darstellt, der die Services verbindet.
+Daher kommen die Anfragen durch MetalLB herein, aber Traefik verteilt sie an die richtigen Services.

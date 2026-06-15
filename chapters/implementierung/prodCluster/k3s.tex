@@ -1,0 +1,11 @@
+\subsubsection{k3s}
+
+Da der Production Cluster im Hochschulnetzwerk ohne Cloud-Einbindung betrieben werden soll, musste auf einen geringeren Ressourcenverbrauch geachtet werden.
+Darüber hinaus benötigt Codetask aufgrund seiner überschaubaren Anzahl an Microservices aktuell noch keinen größeren Cluster.
+Daher wurde sich gegen eine Standard-Kubernetes-Anwendung wie kubeadm oder Kubespray und für eine leichtgewichtige Kubernetes-Anwendung entschieden.
+
+Dabei wurde die Entscheidung für K3s getroffen. Einerseits wurde ein k3s-Cluster parallel in einem anderen Projekt von Herrn Boger eingerichtet, andererseits bietet k3s auch darüber hinaus viele Vorteile.
+Zum einen wurde k3s speziell entwickelt, um ein Kubernetes-Cluster in ressourcenbeschränkten Umgebungen auf Produktionsniveau auszuführen, beispielsweise auf IoT-Geräten.
+Zum anderen hat k3s einen geringeren Einrichtungs- und Wartungsaufwand, da beim Installieren viele Komponenten, wie beispielsweise Traefik als Ingress-Controller, bereits integriert sind. Dadurch müssen weniger Komponenten separat installiert und konfiguriert werden.
+Dadurch kann man sich mehr auf die eigentliche Anwendung konzentrieren statt auf die Clusteradministration.
+Dennoch bleibt K3s einfach erweiterbar, unterstützt Hochverfügbarkeit, bietet eine gute Dokumentation und hat eine große Community.

@@ -1,0 +1,20 @@
+\subsection{Docker Swarm}
+Docker selber bietet als Cluster-Orchestrator Docker Swarm an (zureinfachheit absofort nur Swarm genannt) und ist so mit einer der einfachsten Wege um
+vom einen Compose zu einen Cluster-Orchestrator zuwechseln, da weiterhin die compose.yaml verwendet wird.
+
+Die compose.yaml Datei muss dafür mit dem Befehl docker stack deploy ausgeführt werden, dabei setzt Swarm aber vorraus, dass das Gerät zu einen Cluster gehöhrt bzw 
+wie es in Swarm heißt, einen Docker-Swarm. Es würd aber nicht verlangt, das der Swarm schon aus mehreren Host besteht,
+sondern kann mit dem Befehl docker swarm init, ein Swarm mit nur einen Host auf den Rechner erstellt werden \parencite[vgl. 119]{kofler2023docker}, 
+daher kann Swarm auch nur auf einen Node verwendet werden, auch wenn es als Multi-Node ausgelegt ist.
+
+Dennoch besteht ein Swarm immer aus zwei verschiedenen Arten von Nodes. 
+Einerseits gibt es die Manager Nodes, die die Cluster-Verwaltung übernehmen, andererseits gibt es die Worker Nodes, auf denen die Container ausgeführt werden. 
+Ein Manager Node kann aber auch zusätzlich als Worker Node verwendet werden, beispielsweise wenn der Swarm nur aus einem Node besteht.
+
+Die Vorteile von Swarm im Vergleich zu Compose sind zum einen, dass Swarm direkt auf mehrere Nodes skaliert werden kann und dass die Replikate der Container nun hochskaliert werden können. 
+Swarm sorgt mit seiner Cluster-Verwaltung außerdem dafür, dass die Anzahl der Replicas der Container immer gleich bleibt, auch wenn ein Container oder sogar ein ganzer Node ausfällt.
+Dieser Zustand wird als Desired-State-Prinzip bezeichnet.
+
+Obwohl Swarm einen einfachen Übergang zu einer Cluster-Orchestrierung bietet, ist es dennoch nicht die optimale Wahl als Cluster-Orchestrator.
+Einerseits ist die Anwendung weiterhin an Docker-Techniken gebunden, andererseits ist Swarm nicht so stark verbreitet, weswegen es eine kleinere Community hat.
+Dadurch ist Swarm weniger erweiterbar und flexibler als andere Cluster-Orchestratoren.

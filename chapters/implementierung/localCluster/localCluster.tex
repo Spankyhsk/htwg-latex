@@ -1,0 +1,13 @@
+\section{Aufbau der lokalen Kubernetes-Testumgebung}
+
+Nachdem Codetask so angepasst wurde, dass es in einen Kubernetes-Cluster deployt werden kann, musste dies ausprobiert und weiterentwickelt werden, um Features von Kubernetes einbauen zu können.
+Zu diesem Zweck sollte eine Kubernetes-Testumgebung erstellt werden, die einen Kubernetes-Cluster lokal auf dem Rechner simuliert.
+Ziel dabei war, dass die Studierenden, die an diesem Projekt entwickeln, ihre Veränderungen testen können, ohne dass sie erst lernen müssen, wie ein Kubernetes-Cluster funktioniert bzw. verwendet werden muss.
+Dabei war es mir auch wichtig, die Einrichtung so einfach wie möglich zu gestalten, damit auf den Rechnern der Studierenden so wenig wie möglich eingerichtet werden muss und diese schneller mit der Entwicklung beginnen können.
+In der Vergangenheit hat das lokale Deployment von Codetask den Anfang sehr ausgebremst.
+Ein weiteres Ziel ist es, die Manifeste zu erweitern, um diese in Kubernetes besser nutzbar zu machen.
+
+\input{chapters/implementierung/localCluster/localClusterTools.tex}
+\input{chapters/implementierung/localCluster/localClusterUmsetzung.tex}
+\input{chapters/implementierung/localCluster/localClusterProblem.tex}
+\input{chapters/implementierung/localCluster/localClusterResult.tex}

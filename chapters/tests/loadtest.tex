@@ -1,0 +1,33 @@
+\subsection{Loadtests}
+Mit den Loadtests sollte primär das Verhalten der beiden Umgebungen unter Last, also ihre Stabilität, verglichen werden.
+Gleichzeitig konnte die Fehlertoleranz unter Last beobachtet werden, indem die Fehlerrate betrachtet wurde.
+Es wurden verschiedene Arten von Loadtests ausgeführt. Der kleinste ist der Smoke-Test, der in kurzer Zeit die kleinste Last produziert, die deutlich unter der Last liegt, die für den Normalbetrieb geplant ist.
+Dabei begrenzt sich die Anzahl der virtuellen Nutzer meistens auf fünf.
+Eine höhere Last ergibt sich bei dem Average-Load-Test und dem Stress-Test. Der Average-Load-Test testet die Last, die im geplanten Normalbetrieb auftreten soll.
+Mit der IT und Herrn Boger wurde abgesprochen, dass die Anzahl der Nutzer im Normalbetrieb zunächst bei 100 liegt. Beim Average-Load-Test wird die Last zehn Minuten lang aufrechterhalten.
+Beim Stress-Test ist die Last höher als im Normalbetrieb. Dies wurde mit 200 Nutzern umgesetzt, die die Last ungefähr gleich lang wie beim Average-Load-Test erzeugten.
+Ein Spike-Test wurde ebenso durchgeführt. Dieser erzeugt eine kurze, plötzliche Lastspitze, wie sie z. B. beim Start eines Ticketverkaufs für ein großes Event, wie z. B. den Eurovision Song Contest, häufig auftritt.
+Bei diesem Test wird in sehr kurzer Zeit extrem viel Last erzeugt, hier wären es 10 s. Im Test betrug diese 500 Nutzer. Allerdings wurde bei diesem Test eine kurze Warm-up- und Cooldownphase eingebaut, damit nicht nur alles abstürzt, wenn aus dem Leerlauf heraus eine solche Last passiert.
+In dieser mindestens 1 Minute langen Phase nutzen 50 Nutzer die Anwendung. 
+Zum Schluss wurden Breakingpoint-Tests ausgeführt, die über die Zeit linear immer mehr Last erzeugen, um das System an den Rand des Absturzes zu bringen.
+Dabei stieg die Nutzerzahl innerhalb von 10 Minuten auf 400.
+
+Die Testdateien selbst waren sehr generisch aufgebaut, um wiederverwendbar zu sein. Einstellungen zu den Tests, wie beispielsweise die Länge, wurden mit JSON geladen.
+Im Setup und TearDown in K6 wurden Annotationen an Grafana verschickt, um den Start und das Ende der Loadtests zu markieren. Diese wurden verwendet, um die passenden Monitoring-Daten abzurufen.
+In den Tests selbst wurden mehrere realistische Userflows durchgeführt, die durch einen Mapper passend zu einem virtuellen User zugeordnet wurden. 
+Die Userflows wurden erstellt, indem diese nachgestellt wurden, während das Chrome DevTool die Aufrufe aufgenommen hat und sie so nah wie möglich als Userflow umgewandelt wurden.
+Welche Userflows genutzt wurden und wie viele dieser prozentual über die virtuellen User vergeben wurden, war abhängig von den Szenarien.
+
+Es gibt drei Szenarien. Im ersten Szenario gibt es nur einen UserFlow, in dem sich die virtuellen User in Codetask einloggen. Damit sollte speziell die Authentifizierung getestet werden.
+Das Einloggen in den anderen Szenarien fällt damit weg, damit diese Szenarien getestet werden und nicht immer wieder die Authentifizierung.
+
+Das zweite Szenario waren die Vorlesungen. Dieses Szenario sollte den Normalbetrieb nachahmen. Dabei gibt es zwei verschiedene Userflows für Studierende.
+Einige Studierende durchlaufen die Vorlesungen und erfüllen die Aufgaben, während andere bei der Bearbeitung der Aufgaben unkonzentriert sind und zwischendurch durch die Website klicken.
+Ein weiterer Userflow ist für die Lehrenden auf der Plattform vorgesehen. Sie überwachen Statistiken und verwenden die Editoren für Kurse und Aufgaben.
+Der letzte Userflow simuliert einen sehr kleinen Anteil von Personen, die Codetask nur nebenbei geöffnet haben, während sie sich mit etwas anderem beschäftigen.
+
+Das dritte Szenario sind die Klausuren, da dies der kritische Punkt bei Codetask ist, der zuverlässig funktionieren muss.
+Zwei der User Flows richten sich komplett auf die Klausuren. Der eine richtet sich an die Studierenden, die an ihrer Klausur arbeiten, der andere an die Prüfenden, die die Klausur über Codetask überwachen.
+Da Codetask flächendeckend benutzt werden soll, sind für die Klausuren auch die beiden UserFlows enthalten, in denen die Studierenden ihre Kurse bearbeiten und auch der Flow, in dem Personen Codetask im Leerlauf verwenden.
+
+Es war geplant, die Quiztasks als Szenario zu testen, da diese als Testat benutzt werden sollten. Zum Zeitpunkt der Tests waren sie jedoch zu fehlerhaft, um sie richtig testen zu können.

@@ -1,0 +1,30 @@
+\subsection{Testumgebung}
+Beide Umgebungen sollten mit der entsprechenden Hardware, auf der die Systeme betrieben werden, getestet werden.
+Daher wurden weder das lokale Docker Compose noch der Kind-Cluster verwendet. 
+Dies würde auch falsche Testdaten produzieren, da auf dem eigenen Rechner weitere Prozesse laufen als nur diese Umgebungen.
+Zum anderen würden die Services im Dev-Modus laufen und Docker Compose würde der Traefik-Service fehlen. 
+Der Kind-Cluster hat auch keine HA-Architektur und zusätzlich hat jeder Service nur einen Pod, um Last auf den lokalen Geräten zu sparen, da auch wenn Kind mit Docker drei Nodes simuliert, alle Nodes dennoch auf einer Hardware betrieben werden.
+
+Daher werden die im Hochschulnetzwerk betriebenen Umgebungen genutzt. Bei Kubernetes wäre dies der k3s-Cluster.
+Bei Docker Compose wurde allerdings die Staging-Umgebung genutzt, um den Betrieb in der Produktionsumgebung nicht zu stören.
+Diese beiden Umgebungen unterscheiden sich jedoch nicht voneinander, wodurch die Ergebnisse nicht unterschiedlich ausfallen würden.
+
+Um den Ressourcenverbrauch und die Container-Gesundheit in beiden Umgebungen messen zu können, wurden Grafana und Prometheus als Monitoring-Tools in beiden Umgebungen eingefügt.
+
+Um in den Loadtests und Chaos-Tests Last zu erzeugen, wurde k6 verwendet. 
+Mit k6 wurde nicht nur die Last erzeugt, sondern auch die Fehlerrate, die Antwortzeit sowie die Anzahl der Requests pro Sekunde gemessen.
+Die Entscheidung, k6 als Loadtest-Tool zu verwenden, wurde getroffen, da sich mit k6 durch die skriptbasierte Erstellung von Testfällen und Testszenarien, diese sich flexibler definieren lassen und sich gut automatisieren lassen. 
+Dadurch vereinfachten sich auch die Wiederholbarkeit und die Wiederverwendung von Tests.
+
+Das Auslösen der Tests, die Produktion der Last sowie das Einsammeln der Testergebnisse wurden nicht auf den gleichen Umgebungen ausgeführt wie eine der Testumgebungen.
+Dadurch sollte verhindert werden, dass während der Tests zusätzliche Lasten auf den Umgebungen entstehen, die die Testergebnisse verfälschen könnten.
+Stattdessen wurden die Tests auf dem eigenen Rechner ausgeführt. Dieser diente als Client, der die Last an die Testumgebung verschickte.
+
+Damit die Tests leicht reproduzierbar sind und jedes Mal gleich ausgeführt werden, wurden sie so erstellt, dass sie vollständig automatisiert durchgeführt werden können.
+Der Ablauf der Automation ist wie folgt, zunächst wird sie mit der Information gestartet, welche Tests ausgeführt werden sollen. 
+Nach dem Start verbindet sich die Automation über einen SSH-Tunnel mit dem Monitoring, bereitet die Testumgebung vor, indem beispielsweise die Testuser in der Datenbank erstellt werden und führt anschließend den Test aus.
+Nach dem Test räumt die Automation die Testumgebung wieder auf, sodass sie sich wieder im Zustand vor dem Test befindet. Anschließend sammelt sie die Testdaten vom Monitoring ein und wertet diese zusammen mit den k6-Testdaten aus.
+Dies wird für jeden angegebenen Test durchgeführt, bis alle dran gewesen sind.
+
+Während der Tests war das Deployment gesperrt, damit alle Tests unter gleichen Bedingungen durchgeführt werden konnten.
+Alle Tests wurden dreimal pro Umgebung ausgeführt, um sicherzustellen, dass keine einzelnen Testläufe die Umgebung unnötig verschlechtern.

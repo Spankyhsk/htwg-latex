@@ -1,0 +1,38 @@
+\chapter{Einleitung}
+
+Wir leben in einer Zeit der Digitalisierung. Immer mehr Bereiche des Lebens werden durch digitale Lösungen vorangetrieben.
+Dazu gehören auch Lernveranstaltungen. Mithilfe von Webseiten wie Moodle können Vorlesungsinhalte sowie Testate digital angeboten werden.
+Besonders in Fachbereichen wie der Informatik bietet es sich an, Vorlesungen und Klausuren zu digitalisieren, da der Code schließlich digital und nicht auf Papier ausgeführt werden soll.
+Daher soll für den Kurs „Programmiertechnik 1” zukünftig die Lernplattform Codetask verwendet werden. 
+Mit Codetask sollen Vorlesungen und Klausuren durchgeführt werden. Der Schwerpunkt von Codetask liegt auf der Programmiersprache Scala.
+In den Vorlesungen werden Inhalte vorgetragen und passende Aufgaben zum Thema gestellt, die von den Studierenden bearbeitet werden sollen.
+Zu diesen Aufgaben gehören Single-Choice-Fragen, Multi-Choice-Fragen, Textaufgaben und Lückentextaufgaben, die als „Koans” bezeichnet werden.
+Eine weitere Aufgabenart, die bei Codetask eine Besonderheit ist, sind Codeaufgaben, bei denen die Studierenden einen funktionierenden Code schreiben müssen.
+Dieser Code wird dann durch einen internen Compiler ausgewertet, um zu prüfen, ob er funktioniert. Diese Art der Aufgabe wird „Codetask” genannt.
+Die gleichen Aufgabenarten sollen auch in den Klausuren gestellt werden.
+
+Da Vorlesungen und insbesondere Klausuren mit Codetask durchgeführt werden sollen, muss Codetask auf einem zuverlässigen System betrieben werden.
+Eine Klausur ist ein kritischer Bereich, in dem die Anwendung verfügbar bleiben muss.
+Die Anwendung muss dabei stabil gehalten werden, damit es bei einer Klausur zu keinen Ausfällen kommt. Falls doch welche auftreten, muss die Anwendung schnell wiederhergestellt werden.
+Fehler im System dürfen die Klausuren nicht beeinflussen.
+
+Aktuell wird Codetask auf einem Docker Compose betrieben.
+Ein Docker Compose bietet jedoch keine optimale Ausfallsicherheit, da jeder Service nur einmal ausgeführt wird und die gesamte Anwendung nur auf einem Server läuft.
+Dadurch ist die Last der Anwendung auf einen Server ausgelegt und an dessen Grenzen limitiert.
+Dabei ist inzwischen schon normalität, Anwendungen in verteilten Systemen zu betreiben. 
+Der benötigte Ressourcenverbrauch erhöht sich schneller in der Gesellschaft, als die Hardwareentwicklung sich an diesen Ressourcenverbrauch anpassen kann.
+Es ist aber oft auch günstiger, mehrere Hardware-Systeme mit normalem Ressourcenverbrauch zu beschaffen, als ein System, das einen größeren Ressourcenverbrauch verwalten kann.
+Seine Anwendung auf mehrere Systeme zu verteilen, bringt aber nicht nur die Lastverteilung, sondern macht auch die Anwendung ausfallsicherer.
+Fällt eine Hardware eines Systems aus, kann die Anwendung auf die andere Hardware weiterbetrieben werden.
+Dadurch stellt sich die Frage, ob Codetask für die Produktionsumgebung in einem verteilten System besser aufgehoben ist.
+Um Codetask in einem verteilten System zu betreiben, soll Kubernetes verwendet werden. Kubernetes selbst bietet dabei auch viele Features, mit denen die Zuverlässigkeit von Codetask zunehmen kann.
+
+Daher beschäftigt sich diese Arbeit mit der Umstellung von Codetask von einer Docker-Compose-Umgebung auf eine funktionierende Kubernetes-Umgebung.
+Zu diesem Zweck muss zunächst ein Kubernetes-Cluster im Hochschulnetzwerk ohne Cloud-Einbindung erstellt werden. Dieser soll so eingerichtet werden, dass eine höhere Zuverlässigkeit erzielt wird.
+Abschließend sollen die Docker-Compose-Umgebung und die Kubernetes-Umgebung durch Tests verglichen werden. Dabei wird evaluiert, wie sich die Zuverlässigkeit in den Kategorien Verfügbarkeit, Fehlertoleranz, Stabilität und Wiederherstellbarkeit unterscheidet.
+
+Zunächst werden die wichtigsten Grundlagen von Docker Compose und Kubernetes sowie die Faktoren, die die Zuverlässigkeit beeinflussen, vorgestellt. Anschließend wird erläutert, wie Kubernetes die Zuverlässigkeit verbessern kann.
+Anschließend wird das aktuelle System, das mit Docker Compose betrieben wird, analysiert und vorgestellt.
+Daraufhin wird die Implementierung der Kubernetes-Umgebung vorgestellt und dabei auch erörtert, wie sich dadurch die Zuverlässigkeit erhöhen kann.
+Nach der Implementierung der Kubernetes-Umgebung werden beide Umgebungen mit Load- und Chaostests getestet und die Ergebnisse verglichen.
+Zum Schluss folgt das Fazit, in dem die Einschätzung präsentiert wird, ob sich die Umstellung rentiert, und aufgezeigt wird, wie darauf aufgebaut werden kann.

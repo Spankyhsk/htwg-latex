@@ -1,0 +1,32 @@
+\subsection{Umsetzung / Konfiguration}
+
+Die erste Umsetzung besteht darin, aus einer der vorhandenen Docker-Compose-Dateien Manifeste zu erstellen.
+Um den Prozess zu vereinfachen und zu beschleunigen, habe ich mich entschieden, das Tool Kompose zu verwenden.
+Ich entschied mich dabei für die Compose.yml-Datei der lokalen Umgebung. 
+Da diese im Root-Verzeichnis liegt, war es einfacher, sie mit Kompose zu verwenden. Zusätzlich benötigt das lokale Compose im Gegensatz zu den anderen beiden Composes keine externen Dateien, abgesehen von der mongo-init.js.
+Ein weiterer Grund, warum ich mich für das lokale Compose entschieden habe, ist, dass es einen Service weniger hat als die anderen beiden Compose.
+
+Nun musste ich im Root-Verzeichnis des Projekts nur den Befehl „Kompose convert“ eingeben und schon hatte ich zu jedem Service im Compose passende Manifeste, die auf die Compose-Datei basieren. Ausgenommen war mongo-express, da dieser zu diesem Zeitpunkt auskommentiert war. Dieser war aber nicht vonnöten.
+Zu den Manifesten gehörten jeweils ein Deployment, ein Service und falls nötig ConfigMaps.
+
+ConfigMaps sind Konfigurationen in Form von Key-Value-Pairs für die Container. Sie können für Env-Variablen oder, wie bei Codetask, zur Veränderung von Konfigurationen verwendet werden, ohne dass der Container neu deployed werden muss, wie es schon im Compose der Fall war.
+Das hatte den praktischen Nutzen, dass ich die Konfiguration der Anwendungen an Kubernetes anpassen konnte, ohne den aktuellen Betrieb zu stören.
+Empfindliche Daten wie z. B. Passwörter oder Token sollten aber nicht in ConfigMaps, sondern in Secrets gespeichert werden. Diese sind wie ConfigMaps, nur dass die Daten verschlüsselt im Cluster gespeichert sind.
+
+Nach der Erstellung der Manifeste werden alle auf das Root-Verzeichnis des Projekts gelegt. Um mehr Ordnung zu schaffen, wurde im nächsten Schritt für jeden Service ein Helm Chart erstellt.
+Die Helm-Charts wurden jedoch nicht in einem eigenen Repository gespeichert, sondern im Ordner „./charts” im Projektverzeichnis. Für jeden Service wurde ein Ordner erstellt, in dem eine Chart.yaml-Datei angelegt wurde, in der Organisationsinformationen wie Name und Version des Charts gespeichert werden. Zusätzlich wurde ein weiterer Unterordner namens „templates” erstellt, in dem die Manifeste des jeweiligen Services gespeichert wurden.
+Somit verfügt das Projekt nun über Helm-Charts für API, AI-API, Check-API, Frontend, MongoDB und NGINX. Der Helm-Chart von nginx wurde jedoch direkt entsorgt, da dieser durch einen vorgefertigten Helm-Chart ersetzt werden soll.
+
+Für MongoDB habe ich mich jedoch entschieden, das eigene Helm-Chart zu behalten, um bei der Datenbank mehr Kontrolle zu behalten, da der MongoDB-Driver des Projekts zu dem Zeitpunkt nicht neuere MongoDB-Versionen verwenden konnte.
+Für das MongoDB-Chart musste dennoch eine Überarbeitung durchgeführt werden, da MongoDB als Datenbank keine stateless Anwendung ist und ein Deployment daher die falsche Wahl ist.
+Daher wurde das Deployment, das Kompose für Mongodb erstellt hat, um einen StatefulSet ergänzt.
+
+Ein StatefulSet unterscheidet sich von einem Deployment dadurch, dass es behutsamer mit den Pods umgeht. Pods haben in einem StatefulSet eindeutige Identifikationen, die auch nach einem Neustart bestehen bleiben und aus Pod-Name und Index bestehen.
+Pods werden in einem StatefulSet auch in einer festen Reihenfolge erstellt und wieder gelöscht.
+StatefulSets verwenden direkt Persistent Volumes und Persistent Volume Claims. Diese werden benötigt, um langfristig persistente Daten zu speichern und zu verwalten.
+
+Nachdem das Deployment von MongoDB durch einen StatefulSet ersetzt wurde, wurde für jede Helm-Chart-values.yaml-Datei eine neue Version angelegt und die Manifeste so angepasst, dass die Key-Value-Zuordnung funktioniert. Dafür haben alle Keys in der values.yaml-Datei die gleichen Werte erhalten, die zuvor im Manifest standen.
+Das Besondere an Helm ist dabei aber nicht nur, dass eine solche Ordnung eingebaut werden kann, sondern auch, dass beispielsweise If-Verzweigungen genutzt werden können. Es wurden If-Verzweigungen für Werte genutzt, die nur in einer lokalen Umgebung genutzt werden müssen, z. B. um die Konfigurationen für die Container zu überschreiben, damit diese verändert werden können, ohne dass die Container neu bereitgestellt werden müssen.
+
+Es wurde gegen ein Umbrella Chart entschieden. Das ist ein Helm-Chart, das alle Helm-Charts, die benutzt werden sollen, als Abhängigkeit enthält, wodurch eine Anwendung ein zentrales Helm-Chart besitzt.
+Diese Entscheidung wurde getroffen, damit die Services unabhängig voneinander bleiben.

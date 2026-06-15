@@ -1,0 +1,97 @@
+\subsection{Umsetzung / Konfiguration}
+Zur Einrichtung von GitOps wurde ein neues Git-Repository in der GitLab-Gruppe „Kompetenzquartet” angelegt. Dieses wird von FluxCD beobachtet und enthält keinen Anwendungscode.
+Die Repository-Struktur besteht aus /apps, das die Helmreleases für die Microservices beinhaltet. Weiterhin gibt es den Ordner /infra, in dem die Infrastruktur des Clusters enthalten ist, z. B. die Cluster-Dienste und Namespaces.
+Im Ordner /cluster sind die Informationen, die FluxCD zum Verwalten des Clusters benötigt.
+Jeder dieser Ordner ist zusätzlich in /prod für den k3s-Production-Cluster und in /dev für den lokalen kind-Cluster für das Development aufgeteilt.
+Im Ordner /charts befinden sich die selbst erstellten Helm-Charts, die zuvor noch im Codetask-Repo waren. Im Ordner „image-automation” ist eine FluxCD-Technik zur Deployment-Automatisierung festgelegt.
+\begin{figure}[htbp]
+
+\dirtree{%
+.1 codetask-gitops/.
+.2 apps/.
+.2 charts/.
+.2 cluster/.
+.2 image-automation/.
+.2 infra/.
+.3 dev/.
+.3 prod/.
+.4 namespaces/.
+.4 platform/.
+.4 sources/.
+.2 .sops.yaml.
+}
+
+\caption{Vereinfachtes Projektverzeichnis des GitOps}
+\label{fig:gitopsstruktur}
+
+\end{figure}
+
+Während bei /infra/dev die Cluster-Dienste, die zuvor schon immer mit dem Autoscript in den Dev-Cluster geladen wurden, eingefügt wurden, wurden bei /infra/prod neue Cluster-Dienste sowie weitere Namespaces festgelegt. Namespaces werden genutzt, um Services voneinander zu isolieren.
+Anders als beim Dev-Cluster sind die eigenen Microservices nicht im Default-Namespace, sondern im eigenen Namespace „codetask” codiert.
+
+Da Traefik in k3s bereits vorhanden ist, musste dieser unter /infra/prod nicht zusätzlich angegeben werden. 
+Da der Prod-Cluster aber im Gegensatz zum Dev-Cluster eine HA-Architektur hat, wurden die Cluster-Dienste Longhorn und MetalLB in der Infrastruktur des Prod-Clusters festgelegt.
+Unter dem Ordner /infra/prod/sources befinden sich die Helm-Repositories der Cluster-Dienste. In diesen ist festgelegt, welche Helm-Charts FluxCD benutzen soll und woher er diese bekommt. 
+Diese werden im Namespace von FluxCD im Cluster zugeordnet.
+Die Helm-Repositories dienen daher als Quelle der Helm-Charts.
+
+Im Ordner /infra/prod/platform sind die HelmReleases vorhanden. In diesen wird festgelegt, welche Helm-Charts und mit welchen Konfigurationen von FluxCD in den Cluster installiert werden sollen.
+In den HelmReleases wird die Referenz auf das Helm-Repository des Helm-Charts angegeben sowie Anpassungen der Werte des Helm-Charts vorgenommen.
+Daher wird in den HelmReleases die gewünschte Installation des Helm-Charts festgelegt, wie sie im Cluster gewünscht wird.
+
+Im Ordner /infra/prod/platform werden nicht nur die Helm-Releases eines Cluster-Dienstes, sondern bei Bedarf auch weitere Objekte angegeben.
+Dies war bei MetalLB nötig, um den IP-Adresspool anzugeben. In diesem Pool stehen eine Reihe externer IP-Adressen, die von der IT zugewiesen wurden.
+Ein weiteres wichtiges Objekt, das unter MetalLB vorhanden war, ist eine HelmChartConfig. Diese wird verwendet, um den Standard-Traefik so umzuschreiben, dass dieser MetalLB sowie den angegebenen IP-Adresspool verwendet.
+
+Im Ordner /apps wurden die Helm-Releases für die eigenen MicroServices API, Check-API, AI-API und Frontend entworfen.
+Da sich die Helm-Charts bereits im Repository befinden, musste kein zusätzliches Helm-Repository angelegt werden, sondern im Helm-Release wurde der Ordnerpfad zu den jeweiligen Helm-Charts angegeben.
+Die Helm Releases in den Ordnern /apps/dev und /apps/prod unterscheiden sich durch unterschiedliche Überschreibungen der Standardwerte der Helm Charts, die an die Umgebung angepasst sind, in der das Helm Release installiert wird.
+Ein Unterschied ist, dass der Dev-Cluster weiterhin seine Container aus dem In-Cluster-Registry erhält, während der Prod-Cluster diese aus dem Container-Registry des Codetask-GitLab-Repositories ausliest.
+
+Nachdem die Infrastruktur und die Anwendung im GitOps-Repository festgelegt wurden, musste FluxCD eingerichtet werden.
+Um die Einrichtung besser zu dokumentieren und mehr Kontrolle bei der Einrichtung zu haben, wurde dies manuell durchgeführt, anstatt den Bootstrap-Befehl zu nutzen, den Flux alternativ anbietet.
+Dafür wurde zuerst FluxCD in den Cluster instaliert mit dem Befehl aus Listing \ref{lst:instalFlux}.
+\begin{lstlisting}[language=bash, caption={Installation Befehl von FluxCD auf den Cluster}, label={lst:instalFlux}]
+kubectl apply -f https://github.com/fluxcd/flux2/releases/latest/download/install.yaml
+\end{lstlisting}
+Damit FluxCD nach der erfolgreichen Installation weiß, welches Git-Repository beobachtet werden muss, wird eine Datei namens „gitrepository.yaml” in den Cluster eingefügt.
+In dieser Datei ist die URL des GitOps-Repositories angegeben und es wird festgelegt, dass der Hauptzweig beobachtet werden soll. Die Datei ist im Ordner /cluster zu finden.
+Da das GitOps-Repo auf privat gestellt ist, ansonsten wäre Codetask für jeden zum Deployen offen, muss zunächst, bevor die gitrepository.yaml in den Cluster geladen wird, ein Secret, das die Zugangsdaten für das GitOps-Repo beinhaltet, manuell in den Cluster geladen werden. Anschließend muss die gitrepository.yaml so angepasst werden, dass sie das Secret referenziert.
+
+Da das GitOps-Repository mehrere Cluster verwaltet, muss FluxCD jeweils wissen, welche Konfiguration zu welchem Cluster gehört und in welcher Reihenfolge das Deployment stattfinden soll, da die Infrastruktur vor den Anwendungen bereitgestellt sein muss. Dabei soll die Struktur leicht erweiterbar bleiben, falls weitere Cluster, wie beispielsweise ein Staging-Cluster, erstellt werden.
+FluxCD verwendet Kustomizations als Synchronisationsobjekte. Diese verweisen auf Ordner oder YAML-Dateien im Git-Repository.
+Durch die Verwendung mehrerer Kustomizations können Bereiche besser aufgeteilt werden. 
+Die Ordner und YAML-Dateien werden dabei durch Kustomizations von FluxCD überwacht und verwendet.
+Dabei muss man bei FluxCD zwischen Flux-Kustomizations und der standardmäßigen kustomization.yaml unterscheiden, die verwendet werden.
+Letztere beschreibt die Kubernetes-Objekte innerhalb eines Verzeichnisses, während die Flux-Kustomization definiert, welche Verzeichnisse wie synchronisiert werden sollen.
+
+Die Standard-kustomization.yaml ist dabei in den meisten Unterordnern zu finden, während die Flux-Kustomizations nur im Ordner „/cluster” zu finden sind.
+Jeder Cluster hat ein Root-Kustomization, das manuell in den Cluster geladen werden muss und auf das Verzeichnis verweist, in dem sich die anderen Flux-Kustomizations befinden.
+Dadurch können bestehende Flux-Kustomizations verändert oder neue hinzugefügt werden. 
+Einige Komponenten sind von anderen Komponenten abhängig, weswegen die Reihenfolge, in der die Komponenten im Cluster bereitstehen, wichtig ist.
+Daher wurde die Konfiguration in mehrere Kustomizations aufgeteilt, um die Reihenfolge gezielter steuern zu können.
+
+Durch das manuelle Einfügen der Root-Kustomization hat sich der Cluster selbst eingerichtet.
+Danach wurden nur noch kleinere Modifikationen durchgeführt. 
+So wurde beispielsweise der Standard-LB von k3s ServiceLB deaktiviert, um ihn durch MetalLB zu ersetzen. Letzteres bietet eine produktionnähere Umgebung, da es feste externe IP-Adressen verwendet, während ServiceLB die Services über die IP-Adressen der Nodes verfügbar macht.
+Die IP-Adresse sowie der Host wurden als DNS-Einträge in das HTWG-Netz eingefügt und sind über VPN erreichbar.
+Damit die Hosts über HTTPS erreichbar sind, werden TLS-Secrets in den Cluster geladen. In diesen Secrets sind die TLS-Zertifikate enthalten.
+Die TLS-Secrets werden aber nicht über GitOps in den Cluster geladen, sondern über ein Automationsskript das auf einer der Nodes liegt.
+Damit kann die IT die Zertifikate automatisch austauschen, wenn diese erneuert werden müssen.
+
+Weitere Änderungen waren Erweiterungen der Helm-Charts, um diese zuverlässiger zu gestalten. 
+Dazu gehört, dass Affinitäten eingerichtet wurden, damit Pods der Anwendung auf den Worker Nodes bleiben und bei MongoDB sogar so, dass sich keine der Pods auf dem gleichen Node befindet.
+Um die Pods der Anwendungen besser zu verteilen, wurde außerdem „topologySpreadConstraints” hinzugefügt, wodurch die Pods gleichmäßig auf die Nodes verteilt werden.
+Für die API, Check-API und AI-API wurde auch ein Horizontal Pod Autoscaler eingerichtet, der die Anzahl der Pods für diese Dienste automatisch nach Last hoch- und runter skalieren kann.
+
+Für Tokens, Passwörter und weitere sensible Daten wurden in den GitOps-Repositories Secrets angelegt. Diese sind für die Produktionsumgebung mit SOPS verschlüsselt.
+Im GitOps-Repository ist der Public Key zum Verschlüsseln hinterlegt, während im Cluster der Private Key zum Entschlüsseln eingefügt wird. In den Flux-Kustomizations muss lediglich die Referenz auf den privaten Schlüssel hinzugefügt werden.
+
+Um das Deployment für die Produktionsumgebung zu automatisieren, wurde die ImageUpdateAutomation im Ordner /image-automation eingerichtet.
+Sie überwacht das Container-Registry des Codetask-GitLab-Repositorys und vergleicht die Container anhand der Tags.
+Sie ist so eingestellt, dass der Container mit der höchsten Zahl im Tag als neuer angenommen wird.
+Erkennt die ImageUpdateAutomation einen neuen Container, schreibt sie das Repository mit dem neuen Tag in das passende Helm-Release unter /apps/prod und pusht die Änderung in das GitOps-Repository. Dadurch passt FluxCD den neuen Git-Zustand an und zieht das neue Image.
+Dabei kann die ImageUpdateAutomation die einzelnen Microservices unterscheiden. Damit die ImageUpdateAutomation weiß, wohin das Repository neu geschrieben werden muss, wird dies im HelmRelease passend markiert.
+
+In dem Codetask-Repository wurde die Pipeline mit neuen Jobs ergänzt, die für die Übergangszeit ein separates Container-Registry pro Service erstellen. Dabei ist der Tag die Pipeline-ID, die bei jeder Durchführung um eins erhöht wird.
+Zusätzlich wurde die Pipeline so eingerichtet, dass sie nur noch Images für die Kubernetes-Umgebung erstellt und in das Container-Registry pusht, wenn wirklich eine Änderung in den MicroServices stattgefunden hat.

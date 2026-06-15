@@ -1,0 +1,14 @@
+\subsection{Probleme und Anpassungen}
+Beim Einrichten des lokalen Clusters sind Probleme aufgetreten.
+Das erste Problem das entstanden ist war das lokale Registry der Images. Zwar hat kind eine eigene Lösung dafür, diese funktoniert aber unter Windows nur über den WSL, was gegen das Ziel sprach, dass der Lokale Cluster schnell und simple eingerichtet wird sprach, 
+zum weitern arbeitet kind aktuell an einer bessern build-in Lösung für das lokale Registry \parencite{kind_local_registry}.
+Daher wurde zunächst das Feature benutzt, bei dem die Images einfach in Kind geladen werden können. Dies war jedoch aufgrund der drei Nodes speicher- und RAM-intensiv, da die Images jeweils in alle drei Container geladen wurden.
+Schlussendlich wurde sich daher für ein In-Cluster-Registry entschieden, wodurch das Container Registry in der lokalen Umgebung im Cluster ist.
+
+Ein weiteres Problem entstand durch die Probes. Da die Healthchecks von den Pods selbst durchgeführt werden und die Pods im Kubernetes-Netzwerk eine eigene IP-Adresse haben, standen sie nicht in der Whiteliste der Play-Config, wodurch die Probes ständig fehlschlugen.
+Da die Pods kurzlebig sind und bei einem Neustart ihre IP-Adresse verändern, konnte diese auch nicht in die Play-Config hinzugefügt werden. Daher musste in die White List der Play Config eine Wildcard eingefügt werden, um alle Pods zu erlauben. Da die Pods nur intern im Kubernetes-Netzwerk erreichbar sind und nur von außen über Ingress, entsteht dadurch aber kein Sicherheitsrisiko.
+
+Bei der Einrichtung der Ingress gab es für den lokalen Cluster auch Probleme durch den Hostnamen. Da alle drei Services zunächst als Host „localhost” hatten, mussten diese mit Prefixen, die abgeschnitten wurden, unterschieden werden.
+Die Präfixe wurden abgeschnitten, was zu Problemen bei den WebSockets der ai-API geführt hat. Dadurch wurden unterschiedliche Hosts benötigt.
+Damit dennoch localhost als Basis verwendet werden kann und die Studierenden nichts in ihren Host-Dateien verändern müssen, startet die Automation zusätzlich einen DNS-Resolver mit einer DNS-Wildcard, damit verschiedene Hosts verwendet werden können.
+Damit es plattformübergreifend ist, läuft dieser DNS-Resolver in Docker.

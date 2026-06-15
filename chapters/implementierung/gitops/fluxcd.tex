@@ -1,0 +1,7 @@
+\subsubsection{FluxCD}
+FluxCD ist ein GitOps-Controller und funktoniert als deklarative Deployment-Steuerung.
+Ein GitOps-Controller befindet sich innerhalb des Cluster und vergleicht kontunuierlich den Git Zustand mit den vom Cluster.
+Dabei gilded Git als Single Source of Truth weswegen der Zustand der Infrasturktur und Service einer Anwendung im Git steht.
+Wird etwas im Gitrepo verändert passt ein GitOps-Controller den Cluster automatisch an das Gitrepo an.
+Wenn es Abweichungen im Cluster gibt zu den aktuellen Gitrepo Zustand, wird der Cluster wieder an den Gitrepo-Zustand angepasst.
+Die Entscheidung für FluxCD als GitOps-Controller wurde entschieden, weil FluxCD geringer ressourcenverbrauchend ist als andere GitOps-Controller.

@@ -1,0 +1,13 @@
+\subsection{Ergebnisse der Umsetzung}
+Durch die Umsetzung war der Production Cluster eingerichtet und konnte Codetask ausführen. Diese Codetask Instance ist über VPN erreichbar.
+
+Durch den Wechsel zur GitOps-Verwaltung ergeben sich einige Vorteile.
+Einerseits gibt es eine erhöhte Sicherheit, da kein weiteres Tool wie z. B. die Pipeline Zugriff auf den Cluster benötigt, sondern der Cluster selbst durch FluxCD auf Änderungen reagiert.
+Außerdem wurde die Verwendung des Clusters einfacher, da die Studierenden das Deployment mit Git-Befehlen verwalten können und nicht direkt Helm- und Kubernetes-Befehle erlernen müssen.
+Die Cluster sind besser dokumentiert, da durch den deklarativen Ansatz die Infrastruktur und Anwendungen im Soll-Zustand stehen und Veränderungen durch die Commit-History geloggt werden.
+Das Self-Healing hat sich durch die Drift-Detection verbessert, da regelmäßig geprüft wird, ob der Ist-Zustand im Cluster dem Soll-Zustand im Git-Repository entspricht. 
+Das Deployment ist nun auch isoliert von der restlichen Anwendung und wird zentral verwaltet. Das Codetask-Repository ist nicht mehr für das Deployment verantwortlich, sondern muss in der Pipeline nur noch den Code testen und die Images bauen.
+
+Aber auch durch die Erweiterungen von Longhorn und MetalLB können Single Points of Failure verhindert werden. Da MetalLB externe IP-Adressen verwendet, muss keine der Node-IP-Adressen exponiert werden.
+Das Horizontal Pod Scaling verbessert die Stabilität, da die Last nun besser skaliert wird. 
+Auch das gleichmäßige Verteilen der Pods auf die Nodes führt zu einer höheren Verfügbarkeit, Stabilität und Fehlertoleranz.

@@ -1,0 +1,10 @@
+\subsection{Probleme und Anpassungen}
+Das erste Problem, das bei der Umsetzung aufgetreten ist, betraf die Frage, über welchen Port der HAProxy erreichbar ist.
+Normalerweise wird Port 6443 genutzt, da dieser bei Kubernetes-Nodes der lokale Zugang zu den Kube-APIs ist.
+Der Port 6443 ist vom VPN aus jedoch nicht erreichbar, da es sich um einen administrativen Port handelt. 
+Das verursacht keine Probleme zwischen VMs im gleichen Netz. Wenn jedoch außerhalb des Netzes über den VPN mit dem Cluster kommuniziert werden soll, ist dieser blockiert.
+Deshalb wurde der Port, über den HAProxy erreichbar ist, von 6443 auf 443 geändert.
+
+Ein weiteres Problem ergab sich, da die vorhandenen Worker Nodes im Cluster bei der Reaktivierung ständig selbst auf „notReady” gestellt wurden.
+Die Ursache des Problems war, dass die Worker Nodes mit dem Cluster verbunden wurden, aber die Umgebungsvariablen K3S\_TOKEN und K3S\_URL in der Konfiguration fehlten.
+Um das Problem zu lösen, wurden die Umgebungsvariablen manuell in der Konfiguration nachgetragen, wodurch die Worker Nodes stabil im Cluster wurden.

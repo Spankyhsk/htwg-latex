@@ -1,6 +1,46 @@
 \documentclass[]{htwg-report}
 
-\addbibresource{./bib/report.bib}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{dirtree}
+
+\lstdefinelanguage{yaml}{
+  keywords={true,false,null,y,n},
+  keywordstyle=\color{blue}\bfseries,
+  basicstyle=\ttfamily\small,
+  sensitive=false,
+  comment=[l]{\#},
+  commentstyle=\color{gray}\ttfamily,
+  morestring=[b]",
+  morestring=[b]',
+  stringstyle=\color{red},
+  breaklines=true,
+  frame=single
+}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  frame=single,
+  rulecolor=\color{gray!30},
+  xleftmargin=6pt,
+  xrightmargin=6pt
+}
+
+\addbibresource{bib/books.bib}
+\addbibresource{bib/websites.bib}
 
 \begin{document}
 
@@ -17,14 +57,13 @@
 
 \reporttypetext{Bachelor Thesis}
 
-\title[Is it Possible to Write a Sexy Thesis with LaTeX?]{Is it Possible to Write a Sexy Thesis with LaTeX?}
+\title[Kubernetes-Evaluation]{Von Docker Compose zu Kubernetes: Evaluation der Zuverlässigkeit}
+\author{Konstantin Leon Göke}
+\studentnumber{307393}
+\studentemail{konstantin.goeke@htwg-konstanz.de}
 
-\author{Nigel Slaa}
-\studentnumber{123456}
-\studentemail{nigel.slaa@example.nl}
-
-\doclocation{Amsterdam}
-\docdate{12th March 2018}
+\doclocation{Deutschland}
+\docdate{30. Juni 2026}
 
 \makecover[]
 %          
@@ -38,14 +77,19 @@
 %% Use Arabic numerals for the page numbers of the chapters.
 \mainmatter
 
-\input{chapter-1}
+\input{chapters/einleitung/einleitung.tex}
+\input{chapters/grundlagen/grundlagen.tex}
+\input{chapters/systemanalyse/systemanalyse.tex}
+\input{chapters/implementierung/implementierung.tex}
+\input{chapters/tests/tests.tex}
+\input{chapters/fazit/fazit.tex}
 
 %% Use letters for the chapter numbers of the appendices.
 \appendix
 
 %\input{appendix-a}
 
-\printbibliography[heading=bibintoc]
+\printbibliography
 
 \end{document}
 

@@ -1,0 +1,12 @@
+\section{Erweiterung des k3s-Clusters zur Produktionsumgebung}
+
+Das Ziel dieser Umsetzung besteht darin, den erstellten k3s-Cluster für den realen Betrieb vorzubereiten.
+Dazu gehört, die Infrastruktur mit Cluster-Diensten zu erweitern und auszutauschen, um den Inhalt des Clusters an eine HA-Architektur anzupassen.
+Die bisherige Deployment-Verwaltung über den Webhook wurde durch eine GitOps-Verwaltung ersetzt. 
+Dies hat zum Ziel, den Cluster besser zentral verwalten zu können, die Verwaltung zu vereinfachen und nachvollziehbarer zu machen sowie den Cluster reproduzierbarer zu machen.
+Abschließend wurden die eigenen Helm-Charts noch erweitert, um die Services in der Produktionsumgebung zuverlässiger zu gestalten.
+
+\input{chapters/implementierung/gitops/gitopsTools.tex}
+\input{chapters/implementierung/gitops/gitopsUmsetzung.tex}
+\input{chapters/implementierung/gitops/gitopsProblem.tex}
+\input{chapters/implementierung/gitops/gitopsResult.tex}

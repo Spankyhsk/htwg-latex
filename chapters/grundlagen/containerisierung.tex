@@ -1,0 +1,15 @@
+\section{Containerisierung}
+
+Um über Docker und Kubernetes sprechen zu können, müssen zunächst deren grundlegende Technik, die Container, besprochen werden. 
+Es muss geklärt werden, was sie erfüllen, wie sie funktionieren und wie sie sich von virtuellen Maschinen (zur Vereinfachung ab sofort VM genannt) unterscheiden.
+
+Container sollen die Aufgabe erfüllen, dass eine Anwendung auf jeglichen Geräten laufen kann, unabhängig von Betriebssystem, Umgebungsvariablen, Einstellungen und Ähnlichem. 
+Dadurch soll erreicht werden, dass eine Anwendung nicht nur auf dem eigenen Gerät, sondern auf jedem Gerät funktioniert.
+
+Dazu werden die Anwendungen in einem Container gestartet. Dieser führt die Anwendung in einer isolierten Umgebung aus. 
+
+Dieses Konzept wurde, aber nicht von Containern eingeführt, sondern gab es schon mit VMs davor. 
+Es unterscheidet sich aber wie VMs und Container das umsetzen, da eine VM die gesamt benötigte Hardware mit Softwarekomponenten simuliert,
+während Container direkt die Infrastuktur des Host-System mit nutzt, wie den Kernel. \parencite[vgl. 54]{kofler2023docker}
+
+Dadurch sind Container ressourcensparender als VMs. Zudem lassen sie sich schneller aufbauen.

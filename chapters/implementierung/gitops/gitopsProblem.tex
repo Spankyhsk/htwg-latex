@@ -1,0 +1,19 @@
+\subsection{Probleme und Anpassungen}
+Aufgrund der neuen GitOps-Verwaltung musste das Autoscript zum Erstellen des Kind-Clusters angepasst werden.
+Nun wird, anstatt dass alles automatisch in den Cluster geladen wird, zuerst FluxCD auf den Kind-Cluster installiert.
+Darauf folgt die gleiche Reihenfolge wie beim Prod-Cluster. Die Git-Repository-Konfiguration und das Root-Kustomization für die Developer-Umgebung befinden sich im Ordner „./.k8s” und werden jeweils reingeladen.
+Die Zugangsdaten, die FluxCD benötigt, um auf das GitOps-Repository zugreifen zu dürfen, müssen in einer .env-Datei eingetragen werden. Dabei nutzt jeder Studierende seinen eigenen Username und seinen eigenen Access-Token.
+Anschließend richtet FluxCD auch den lokalen Cluster ein.
+
+Ein Problem entstand dadurch, dass Codetask in der öffentlichen Instanz von GitLab liegt und dort in der kostenlosen Variante keine Projekt-Access-Token verwendet werden können.
+Daher konnten diese nicht als Zugangsdaten von FluxCD für das GitOps-Repository verwendet werden.
+Auch die Verwendung eines SSH-Keys war leider nicht möglich, da der SSH-Port 22 blockiert wird, wenn zu GitLab.com ein Known Host erstellt werden soll.
+Auch ein Deploy-Token konnte nicht genutzt werden, da FluxCD nicht nur Lese-, sondern auch Schreibrechte auf das Repository benötigt.
+Daher wurde als Übergangslösung ein „Key Bot” erstellt. Dabei handelt es sich um einen angelegten User mit Maintainer-Rechten in der Gruppe Kompetenzquartet, dessen Person Access Token benutzt wird.
+
+Ein großes Problem ergab sich dadurch, dass Codetask nicht mit mehreren Replicas der Datenbank umgehen konnte, wodurch sich die Anwendung asynchron verhielt.
+Um dies zu verbessern, musste zunächst der Connection String zur Datenbank am Ende um „\&replicaSet=rs0” ergänzt werden, damit MongoDB Replicas verwalten kann.
+Zum anderen wurde das Helm-Chart, in dem das StatefulSet der MongoDB war, durch einen Percona-Operator ersetzt. Operatoren werden in Kubernetes verwendet, um wiederkehrende Aufgaben, die meist manuell erfüllt werden müssen, zu automatisieren.
+Dabei überwacht er den gewünschten Zustand einer Anwendung und führt anwendungsspezifische Logik in Kubernetes aus.
+In diesem Fall übernimmt Percona die Einrichtung und Verwaltung von MongoDB mit einem Replica-Set.
+Zum Vergleich: Ein StatefulSet ist nur dafür verantwortlich, Pods zu verwalten. Ein Percona Operator verwaltet hingegen nicht nur die Pods, sondern zusätzlich auch fachlogisch Mongodb.

@@ -1,0 +1,27 @@
+\subsection{Chaos-Tests}
+Die Chaos-Tests sollen das Verhalten der Umgebung bei Ausfällen testen.
+Dabei wurde von K6 Last erzeugt. Dies entspricht 50 Studierenden, die über einen Zeitraum von 10 Minuten Aufgaben in Codetask bearbeiten.
+Währenddessen wurden verschiedene Ausfälle in den Umgebungen ausgelöst.
+Für Kubernetes wurde dabei ein spezielles Tool namens Chaos Mesh verwendet, das kontrollierte Ausfälle im Cluster erzeugen kann.
+Bei Docker wurden Skripte ausgeführt, die Fehler in der Umgebung auslösten, um Ausfälle zu nutzen. 
+Ursprünglich war in diesen auch ein Test-Tool geplant, doch Docker erkannte, dass die Befehle für die Ausfälle über die Docker-API kamen, wodurch die im Docker Compose festgelegten Restart-Policys nicht verwendet wurden.
+
+Die Chaostests wurden auf drei verschiedene Szenarien eingegrenzt.
+Es gibt zwar deutlich mehr Arten von Chaostests, aber nicht alle eignen sich, um die Zuverlässigkeit von Docker Compose und Kubernetes fair zu vergleichen.
+Ein Beispiel ist der Node-Failure-Test, der untersucht, was passiert, wenn ein Node ausfällt. Bei diesem Szenario ist das Ergebnis vorhersehbar, da bei Docker Compose ein Node-Ausfall einen kompletten Ausfall bedeutet.
+„Partial Degradation”, bei dem der Großteil der Replicas eines Services ausfällt, ist wiederum mit Docker Compose nicht machbar, da dieser immer nur ein Replica pro Service hat.
+Andere Chaostests sind nicht unbedingt Vergleiche zur Zuverlässigkeit, sondern eher Architektur-/Designfragen, wie z. B. Network Chaos, mit dem eher die Netzwerkqualität getestet wird.
+
+Der erste Test ist der Instance-Failure: Dabei fällt ein Teil des Services aus. Bei Kubernetes entspricht dies einem Pod des Services, während bei Docker Compose bereits der gesamte Container des Services ausfällt.
+Mit diesem Test soll die Fehlertoleranz der Umgebung bei einem Ausfall geprüft werden.
+
+Beim zweiten Test, dem Service-Outage, fällt der komplette Service aus. Bei Kubernetes entspricht dies dem Ausfall aller Pods eines Service, während bei Docker Compose wieder der gesamte Container des Service ausfällt.
+Mit diesem Test soll die Wiederherstellbarkeit der Umgebung getestet werden, d. h., wie lange es dauert, bis der Service wiederhergestellt ist und wieder verwendet werden kann.
+
+Der dritte Test ist der Update-Test. Dieser testet, wie lange die Anwendung nicht erreichbar ist, wenn sich der Zustand durch ein Deployment ändert.
+Mit diesem Test soll geprüft werden, wie verfügbar die Anwendungen bei einem Deployment bleiben. Bei Docker Compose wurde dazu der Webhook auf der VM ausgelöst, der das Deployment auslöst.
+Bei Kubernetes wurde ein „kubectl rollout restart deployment” für den jeweiligen Service ausgelöst.
+
+Alle Tests wurden jeweils nur mit der Haupt-API durchgeführt, da diese im Vergleich zu den anderen Services weniger Mehrwert bot. 
+Die Ergebnisse wären ähnlich gewesen. Eine Ausnahme wäre der Update-Test, bei dem ein Unterschied entstanden wäre, wenn beispielsweise die AI-API aktualisiert wird.
+Das Ergebnis ist dabei aber von vornherein vorhersehbar, da beim Docker Compose alle Services beim Update gleichzeitig heruntergefahren und wieder deployed werden, wodurch auch die Haupt-API ausfällt. Bei Kubernetes werden die Services dagegen einzeln deployed.

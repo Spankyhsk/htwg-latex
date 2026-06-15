@@ -1,0 +1,31 @@
+\section{Aufbau des k3s-Clusters}
+Der eingerichtete lokale Cluster dient zum Testen von Implementierungen in einer praxisnahen Umgebung und kann daher als DEV-Cluster bzw. -Umgebung angesehen werden.
+Nun musste ein Cluster für die Produktionsumgebung eingerichtet werden.
+Der Cluster soll nicht in einer Cloud, sondern im Hochschulnetzwerk betrieben werden. 
+Dies ist zum einen eine finanzielle Entscheidung, zum anderen dient es der Absicherung der Privatsphäre, damit die Klausurnoten nur im Hochschulnetzwerk gespeichert sind.
+
+Anders als beim Dev Cluster ist beim Prod Cluster eine hohe Zuverlässigkeit wichtig. 
+Um diese zu erreichen, wird eine High-Availability-Architektur (im Folgenden HA-Architektur genannt) eingesetzt.
+Eine HA-Architektur besteht dabei aus mindestens drei Master-Nodes und zwei Worker-Nodes.
+Zusätzlich verfügt eine HA-Architektur über zwei Load Balancer (kurz LB genannt). 
+
+Ein Load Balancer außerhalb des Clusters ist für die Kubernetes-Komponenten zuständig.
+Da es nun mehrere Master-Nodes gibt, werden die Anfragen von den Worker-Nodes oder kubectl nicht mehr direkt an den Master-Node gestellt, sondern über den Load Balancer, der die Anfrage an die Master-Nodes verteilt.
+Dadurch müssen die Clients nicht erst wissen, welche Master-Nodes aktuell erreichbar sind.
+
+Der andere LB ist innerhalb des Clusters und verteilt den Anwendungs-Traffic auf die Pods.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{bilder/implementierung/HAarchitektur.png}
+\caption{High-Availability Architektur}
+\label{fig:HAarchitektur}
+\end{figure}
+
+Das Ziel ist bei dieser Umsetzung einen Kubernetes Cluster mit einer HA Architektur im Hochschulnetzwerk einzurichten.
+\FloatBarrier
+
+\input{chapters/implementierung/prodCluster/prodClusterTool.tex}
+\input{chapters/implementierung/prodCluster/prodClusterUmsetzung.tex}
+\input{chapters/implementierung/prodCluster/prodClusterProblem.tex}
+\input{chapters/implementierung/prodCluster/prodClusterResult.tex}

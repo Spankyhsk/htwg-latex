@@ -1,0 +1,8 @@
+\subsubsection{Service}
+
+Kubernetes baut ein eigenes internes Netzwerk auf, über das die Pods miteinander kommunizieren können und erreichbar sind.
+Dabei erhält jeder Pod eine eigene IP-Adresse, allerdings ist ein Pod kurzlebig. Wenn ein Pod ausfällt und ersetzt wird, hat der neue Pod nicht die gleiche IP-Adresse wie der Pod davor.
+
+Damit die Pods mit einer festen IP-Adresse erreicht werden können, gibt es in Kubernetes Services, die alle Replicas eines Pods kennen.
+Zusätzlich dient ein Service als Loadbalancer, der den Datenverkehr auf die Pods verteilt.
+Die Kommunikation findet daher nicht über die Pods selbst, sondern über deren Service statt.

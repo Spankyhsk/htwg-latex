@@ -1,0 +1,17 @@
+\section{Docker}
+Docker ist aus der Welt der Container nicht wegzudenken. 
+Zwar hat diese Firma die Container nicht erfunden, aber sie so weit verbreitet, dass sie als Synonym dafür benutzt werden, wie Lego für Klemmbrettbausteine
+
+Ein Container wird durch ein Image erstellt. Die Besonderheit dabei ist, dass das Image ein Read-only-Dateisystem ist und daher im laufenden Container nie verändert werden kann.
+Um ein Image zu erstellen, muss in Docker zunächst ein Dockerfile angelegt werden.
+
+Eine weitere Besonderheit bei Containern sind die sogenannten Volumes. Bei Containern werden Dateien direkt im Host-System gespeichert. Diese Verzeichnisse sind vom Container getrennt.
+Dadurch bleiben die Daten auch erhalten, wenn der Container neu eingerichtet wird.
+Docker legt dabei normalerweise automatisch ein Verzeichnis an, wenn ein Container ein Volume benötigt.
+
+Images müssen aber nicht immer, selber erstellt werden, sondern können auch extern aus dem Internet gezogen werden.
+Dabei bietet sich bei Docker besonderes der Docker Hub an. In dieser von Docker betriebenen Platform können viele Image gefunden werden die von der Docker-Community erstellt wurden.
+Dies kann wie ein Art Werkzeugkoffer angesehen werden, von dem vorgefertige Anwendungen und Umgebungen genutzt werden können oder sogar mit dem eigenen Image kombinierbar sind,
+wie z.B. mongodb, nginx und so weiter \parencite[vgl. 50]{kofler2023docker}. 
+
+Natürlich gibt es da auch wieder mehrere alternativen für den Docker Hub.

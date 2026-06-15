@@ -1,0 +1,10 @@
+\subsubsection{Pods}
+
+Wie schon erwähnt wurde laufen auf einen Node mehrere Pods. Im Pod wiederrum werden einer oder mehrere Container ausgeführt und gemanged.
+Um die Container auszuführen benutzt Kubernetes das Container Runtime Interface (kurz CRI) benutzt, damit noch andere Runtimes als nur die von Docker genutzt werden können \parencite[vgl. 108]{welter2024kubernetes}.
+Anders als bei Compose erstellt Kubernetes die Images nicht mehr selbst, sondern holt sie sich aus Container-Registern.
+
+Wie viele Container in einen Pod laufen sollen, kann selbst entschieden werden, es gibt jedoch Möglichkeiten, wie dies am besten entschieden werden kann.
+Wenn man sich an der Separation of Concerns orientiert, dann sollte von keiner der Container der eigenen Anwendung in den gleichen Pod laufen, es sei denn, die Container müssen gemeinsame Ressourcen teilen oder die Container dürfen nicht auf unterschiedlichen Nodes laufen.
+Es können aber auch kleinere Container in einen Pod hinzugefügt werden, die die Hauptanwendung verbessern, z. B. durch zusätzliches Logging oder einen Proxy. Dabei ist es aber wichtig, dass diese entkoppelt sind von der Hauptanwendung. Falls dies nicht zutrifft, z. B. weil es die Skalierung beeinflusst, wäre es besser, diese zu trennen.
+Diese Art von Container wird auch Sidecar-Container genannt.

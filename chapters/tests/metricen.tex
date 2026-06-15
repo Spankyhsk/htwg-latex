@@ -1,0 +1,23 @@
+\section{Bewertungsgrundlagen und Metriken}
+Die Zuverlässigkeit, die gemessen werden soll, kann in vier Oberkategorien aufgeteilt werden.
+
+Die erste Kategorie ist die Verfügbarkeit. Dabei wird gemessen, wie gut der Service erreichbar ist. Das wird vor allem daran gemessen, ob der Service bei Ausfällen Request bearbeiten kann.
+Es wird auch gemessen, wie lange ein Service bei einem Ausfall offline bleibt.
+ 
+Die zweite Kategorie ist die Fehlertoleranz. Dabei soll gemessen werden, wie mit Fehlern bei Ausfällen und bei Last umgegangen wird.
+Dabei wird vor allem die Error Rate gemessen, die während der Szenarien auftritt, sowie die Frage, ob es zu einem Neustart kommt.
+
+Die dritte Kategorie ist die Stabilität. Dabei wird das Verhalten unter steigender Last getestet.
+Dafür wird zueinen der CPU- und RAM-Verbrauch der Anwendung, aber auch vom gesamten Systems erfasst. Damit soll auch getestet werden, wie die Umgebung die Last skaliert.
+
+Die vierte Kategorie ist die Wiederherstellbarkeit, also die Zeit, die benötigt wird, um den Service nach einem Ausfall wiederherzustellen.
+Dabei wird die TTR (Time to Recovery) gemessen, also die Zeit, die ein System zum Wiederherstellen des Services braucht.
+
+Eine Kategorie, die nur teilweise betrachtet wird, ist die Performance. Zwar beeinflussen sich Performance und Zuverlässigkeit gegenseitig, dennoch sind das zwei verschiedene Aspekte, die meist Hand in Hand gehen.
+Dennoch werden die p95-Latenz und die durchschnittliche Response Time mitgemessen.
+
+Mithilfe eines eigens erstellten Scoring-Verfahrens soll die Zuverlässigkeit bei jedem Test von 0 bis 100 bewertet werden.
+Das Scoring beginnt mit einem Wert von 100 und nimmt ab, wenn die aufgenommenen Metriken auf eine eher schlechte Zuverlässigkeit hinweisen. Die Untergrenze bei jedem Scoring ist 0.
+Dieses Scoring soll dabei helfen, die beiden Systeme besser vergleichen zu können. Je nachdem, was getestet wird, kann sich das Scoring unterscheiden.
+
+Die Metriken sind normalisiert, damit beide Systeme besser verglichen werden können.

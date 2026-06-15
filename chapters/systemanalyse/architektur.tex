@@ -1,0 +1,24 @@
+\section{Architektur Codetask}
+
+Codetask besteht aus einer Microservice-Architektur, die grundlegend aus sieben Services besteht.
+
+Das Backend besteht dabei aus drei Services. Dazu gehört die Haupt-API, aber auch die Check-API, in der ein Scala-Compiler läuft, um Code live auszuführen. In der sogenannten Codetask-Aufgaben können Anwender Code schreiben und prüfen, ob dieser korrekt ist.
+Da Code live ausgeführt wird, wurde dieses Feature in der Check-API isoliert, damit die Haupt-API nicht angegriffen werden kann.
+Die Haupt-API und die Check-API verwenden das Play3-Framework und auch Scala 3.
+Der dritte Service für das Backend ist die AI-API. Diese wird genutzt, damit Studierende beim Bearbeiten von Aufgaben eine KI um Hilfe bitten können.
+Aufgrund der für diese Implementierung benötigten Abhängigkeiten ist die AI-API in Scala 2 geschrieben und nutzt das Play2-Framework. Aus diesem Grund wurde sie von der Haupt-API isoliert.
+Die Haupt-API und die AI-API sind auch von außen erreichbar und haben ihre eigene Host-DNS.
+Alle drei APIs nutzen sbt als Build-Tool und da alle drei mit Scala geschrieben sind, sind diese auch stateless, da Scala eine funktionale Programmiersprache ist.
+
+Für das Frontend werden zwei Services verwendet. Ein Service ist das Webframework, das aus dem Vue3-Framework besteht, der andere Service ist der dazugehörende Webserver nginx.
+
+Die Datenbank ist ebenfalls ein eigener Service. Als Datenbanksystem wird die NoSQL-Technik MongoDB in der Version 6.0.0 verwendet, die das EOL erreicht hat.
+Um die Verwendung von MongoDB zu vereinfachen, gibt es als Service auch Mongo-Express. Mit diesem kann die MongoDB-Anwendung über eine WebUI verwendet werden.
+
+In der Produktions- und Staging-Umgebung gibt es zusätzlich den Service Traefik, der als Reverse Proxy verwendet wird.
+
+Die Aufgaben von Codetask werden in eigenen GitLab-Repositories angelegt und gespeichert. Der Inhalt wird von der Haupt-API abgerufen und dann in der Datenbank gespeichert.
+Dabei gibt es zwei verschiedene GitLab-Repos. Einmal ein öffentliches, in dem der Inhalt der Vorlesungen vorhanden ist, und ein privates, in dem Klausuren erstellt und gespeichert werden. 
+Das private GitLab-Repository ist jedoch noch nicht im Code eingebunden. Damit die Haupt-API auf die Repos zugreifen kann, wird ein Token verwendet.
+
+Alle GitLab-Repos liegen nicht auf der HTWG-Instance, sondern in der öffentlichen GitLab-Instance.

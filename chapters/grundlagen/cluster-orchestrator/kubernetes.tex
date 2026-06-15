@@ -1,0 +1,15 @@
+\subsection{Kubernetes}
+
+Kubernetes bietet mit einer größeren Community, vielen guten Erweiterungen und ausführlichen Domkumentationen
+zum vergleich zu Swarm, trotz höhrer Komplexität, gute Vorteile \parencite[vgl. 452]{kofler2023docker}.
+Dabei darf Kubernetes nicht als Erweiterung von Docker angesehen werden, sondern als eigenständiges System.
+Kubernetes verwendet eine Container Runtime Interface (CRI), weshalb weitere Runtimes verwendet werden können. Dadurch ist Kubernetes nicht auf Docker beschränkt.
+
+Daher wird sich dieser Teil zuerst mit der Architektur beschäftigen und anschließend die Objekte und Ressourcen von Kubernetes vorstellen.
+
+\input{chapters/grundlagen/cluster-orchestrator/kubernetes/architektur.tex}
+\input{chapters/grundlagen/cluster-orchestrator/kubernetes/manifeste.tex}
+\input{chapters/grundlagen/cluster-orchestrator/kubernetes/pods.tex}
+\input{chapters/grundlagen/cluster-orchestrator/kubernetes/deployments.tex}
+\input{chapters/grundlagen/cluster-orchestrator/kubernetes/services.tex}
+\input{chapters/grundlagen/cluster-orchestrator/kubernetes/ingress.tex}

@@ -1,0 +1,9 @@
+\section{Container-Orchestrierung}
+Compose kann als Single-Host-Container-Orchestrierung betrachtet werden, da es mehrere Container auf einem einzigen Host verwaltet und koordiniert.
+Ein Single Host hat den Nachteil, dass es kein Failover gibt, wenn der Host ausfällt, und dass die gesamte Last, die durch die Services verursacht wird, nicht verteilt wird.
+Um das zu verhindern, können die Services auf eine Gruppierung von Host-Rechnern, auch Cluster genannt, verteilt werden. Dies ist mit Compose jedoch nicht möglich.
+Dafür wird eine Cluster-/Multi-Node-Container-Orchestrierung benötigt. Diese verwaltet die Container über Services, die eine weitere Abstraktionsebene über den Container darstellen.
+
+\input{chapters/grundlagen/cluster-orchestrator/dockerSwarm}
+\input{chapters/grundlagen/cluster-orchestrator/kubernetes}
+\input{chapters/grundlagen/cluster-orchestrator/zuverlaessigkeitK8s.tex}

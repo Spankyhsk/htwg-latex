@@ -1,0 +1,18 @@
+\subsubsection{Manifeste}
+
+Die Objekte von Kubernetes, wie beispielsweise Pods, Deployments und ConfigMaps, werden mithilfe von Manifesten festgelegt. 
+Diese Manifeste sind normalerweise YAML-Dateien, die den Aufbau, das Verhalten, die Befugnisse und auch den Inhalt der Objekte beschreiben. 
+Kubernetes selber sagt das für Manifeste auch JSON genommen werden kann \parencite{kubernetesObjects}, dies ist jedoch eher unüblich.
+Manifeste unterscheiden sich je nach Objekt, dennoch gibt es grundlegende Informationen, die angegeben werden müssen.
+Dazu gehört, welches Objekt mit Kind erstellt werden soll und welche Version des Objekts mit Apiversion genutzt werden soll. 
+Zusätzlich müssen grundlegende Informationen über das Objekt unter Metadaten beschrieben werden, wobei mindestens der Name des Objekts angegeben werden muss. 
+Danach kann unter „spec” der gewünschte Zustand und das Verhalten des Objekts festgelegt werden.
+
+\begin{lstlisting}[language=yaml, caption={Beispiel von einen Manifest}]
+apiVersion: v1
+kind: Pod
+metadata:
+    name: my-pod
+spec:
+    ...
+\end{lstlisting}

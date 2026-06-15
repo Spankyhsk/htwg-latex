@@ -1,0 +1,8 @@
+\chapter{Evaluation der Zuverlässigkeit}
+Nach der Erstellung eines Kubernetes-Clusters für eine Produktionsumgebung muss getestet werden, ob die Zuverlässigkeit im Vergleich zum aktuellen System, das mit Docker Compose deployed ist, gestiegen ist.
+Dazu wird das Verhalten beider Systeme unter Last und bei Ausfällen in gleichen Szenarien getestet.
+Damit soll entschieden werden, ob Kubernetes mit seinen Funktionen genügend Auswirkungen hat, um das aktuelle Docker-Compose-Deployment zu ersetzen, obwohl dieses für eine komplexere Verwaltung und einen höheren Ressourcenverbrauch sorgt. 
+\input{chapters/tests/metricen.tex}
+\input{chapters/tests/testflow.tex}
+\input{chapters/tests/results.tex}
+\input{chapters/tests/diskussion.tex}

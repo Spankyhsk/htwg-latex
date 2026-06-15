@@ -1,0 +1,48 @@
+\section{Docker Compose}
+Um eine Anwendung in einer isolierten Umgebung auszuführen, wird ein Container genutzt.
+Wenn die eigene Anwendung aus mehreren Services besteht, wie es bei einer Microservice-Architektur der Fall ist, ist es weniger plausibel, alle Services in einen Container einzubauen. Stattdessen ist es sinnvoller, jeden Service in einen eigenen Container auszuführen.
+
+Dadurch soll das Konzept der Separation of Concerns erreicht werden. 
+Das Ziel besteht darin, einzelne Bestandteile einer Anwendung zu trennen, sodass sie isoliert und unabhängig voneinander funktionieren, z. B. Frontend, Backend und Datenbanken. Das bringt mehrere Vorteile.
+
+Zum einen können sich Entwickler in mehrere Teams aufteilen. Ein Team konzentriert sich dann beispielsweise auf das Frontend, während ein anderes nur für das Backend zuständig ist. 
+So muss sich nicht jeder mit allen Teilen auskennen.
+
+Ein weiterer Vorteil dieser Isolation ist, dass der Code übersichtlicher ist, sich einfacher debuggen lässt und einfacher zu aktualisieren ist.
+Dadurch beeinflussen Fehler nicht die gesamte Anwendung, sondern nur die eigenen Bereiche. Das ist auch bei Containern von Vorteil, da ein Fehler im Code oder in den Einstellungen des Containers nicht die gesamte Anwendung herunterfährt, sondern nur den Container dieses Services beeinflusst.
+
+Zudem bringt die Isolation den Vorteil, dass Services wiederverwendet werden können. So kann beispielsweise ein Container für eine Datenbank für mehrere Anwendungen genutzt werden.
+
+Um die Verwaltung der einzelnen Container zu vereinfachen, bietet Docker das sogenannte Docker Compose an.
+Docker Compose (zur Einfachheit ab sofort Compose genannt) startet alle Container eines Services gleichzeitig, verwaltet diese und richtet ein Netzwerk zwischen ihnen ein.
+
+Das Compose wird mit einer Compose.yaml-Datei eingerichtet.
+Der allgemeine Aufbau einer solchen Datei ist ganz simpel: Zunächst werden unter dem Bezeichner „services” die verschiedenen Services aufgelistet. 
+Darunter werden wiederum eigene Einstellungen für den Container definiert, beispielsweise Volumespfade, Netzwerkports oder Environment-Variablen.
+
+\begin{lstlisting}[language=yaml, caption={Beispiel einer compose.yaml Datei}]
+services:
+    serviceName1:
+        key1: einstellung
+        key2: einstellung
+        ...
+    serviceName2:
+        key1: einstellung
+        key2: einstellung
+        ... 
+    ...
+\end{lstlisting}
+
+Compose kann Images direkt aus dem Internet mit dem Schlüssel „image“ ziehen, aber Compose kann auch Images mit dem Schlüssel „build“ bauen.
+Dafür muss der Pfad des Dockerfiles angegeben werden und der Kontext, den der Build-Prozess erhalten soll.
+
+Zusätzlich zu den Services können weitere Definitionen für Netzwerke und Volumes eingerichtet werden, die für die Container verwendet werden können.
+
+Der Vorteil von Compose ist, dass es einfach zu nutzen ist und sehr einsteigerfreundlich ist.
+Das liegt einerseits daran, dass Compose eine einfache .yaml-Datei ist, andererseits daran, dass Compose alle Container auf einem Host startet. Dadurch verwaltet Compose die Container direkt, alle Container befinden sich im gleichen Netzwerk und die Volumes befinden sich auf dem gleichen Gerät wie der Container. 
+Dabei stößt Compose jedoch auch an seine Grenzen.
+
+Ein Compose ist auf ein Gerät begrenzt. Das reicht zwar bei vielen Anwendungen aus, bietet aber kein Failover, wenn das Gerät ausfällt.
+Zudem wird die gesamte Last nur auf diesem Gerät verteilt. 
+
+Zusätzlich gibt es im Compose von jedem Container nur einen Replica. Daher kann es beim Ausfall oder Update eines Containers zu einer Downtime kommen.

@@ -1,0 +1,17 @@
+\subsection{Auswertung und Scoring}
+Nach jedem Test hat die Automation die Testergebnisse ausgewertet und ein Scoring durchgeführt.
+Mit diesem Scoring sollten aus den verschiedenen Messwerten leicht verständliche Kennzahlen erstellt werden, um die Umgebungen leichter vergleichen zu können. Dabei wurden für die Loadtests und Chaos-Tests verschiedene Scorings verwendet.
+
+Das Scoring beginnt mit dem Wert 100 und wird reduziert, wenn die Messwerte eine geringere Zuverlässigkeit aufweisen.
+Dabei hat jeder Messwert eine eigene Gewichtung, d. h., es wird unterschiedlich viel abgezogen. Zusätzlich hat jedes Ergebnis eines Messwert eine andere Gewichtung.
+Ein Scoring kann dabei nie unter 0 gehen. Je höher das Scoring ist, desto besser ist die Zuverlässigkeit.
+
+Beim Loadtest wurde für das Scoring die Error Rate als Maß für die Fehlertoleranz verwendet.
+Zusätzlich wurden die Messwerte des CPU- und RAM-Verbrauchs des gesamten Systems sowie der Anwendung für die Wertung verwendet, um die Stabilität zu bewerten.
+Auch die Anzahl der Neustarts floss in die Bewertung der Stabilität und der Fehlertoleranz ein.
+In das Loadtest-Scoring floss auch die Performance minimal ein, um die Auswirkungen von der Zuverlässigkeit zu bewerten.
+
+Beim Chaos-Test wird die Error Rate ebenso für die Fehlertoleranz beim Scoring verwendet.
+Aus der Error Rate wird aber auch die Verfügbarkeit berechnet, damit diese im Scoring verwendet werden kann.
+Weitere Metriken, die das Scoring beeinflussen, sind die Recovery Time und die Frage, ob die Umgebung sich wiederherstellen konnte.
+Wenn das System es nicht geschafft hat, sich selbst wiederherzustellen, hat es direkt einen Score von 0 erhalten.

@@ -53,7 +53,7 @@
 \RequirePackage{longtable}
 
 \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
-\lstset{framextopmargin=50pt}
+\lstset{framextopmargin=0pt}
 
 %% 'background' includes 'graphicx' as well
 \RequirePackage[firstpage=true]{background}

@@ -1,0 +1,43 @@
+\section{Diskussion der Ergebnisse}
+Nachdem die Ergebnisse der Tests vorgestellt wurden, werden im Folgenden die Ursachen dieser Testergebnisse erörtert.
+Eine der ersten Dinge, die bei den Loadtests auffallen, ist, dass die Scores der Docker-Compose- und der k3s-Umgebung üblicherweise relativ nah beieinander liegen.
+Das liegt daran, dass Codetask aktuell ein eher kleines System mit einer noch überschaubaren Nutzeranzahl ist, wodurch ein Lastverbrauch entsteht, mit dem Docker Compose mithalten kann.
+
+Das führt direkt zum nächsten Punkt, der in den Testergebnissen auffällt. 
+Die Docker-Compose-Umgebung schneidet in den meisten Loadtests besser ab als die k3s-Umgebung, obwohl die k3s-Umgebung in Bezug auf die Zuverlässigkeit im Vorteil sein sollte.
+Das liegt daran, dass die Ergebnisse der Loadtests von der Performance einer Anwendung beeinflusst werden.
+Kubernetes selbst ist kein Performance-Optimierer, sondern soll eine Anwendung stabil halten. Dadurch ist eine höhere Zuverlässigkeit oft nicht direkt sichtbar.
+In den Testwerten des Vorlesungs- und Klausur-Szenarios fällt auf, dass k3s eine höhere Fehlerrate als die Docker-Compose-Umgebung hat.
+In Tabelle \ref{tab:klausur_average_load_metrics} sind sogar Restarts von Pods bei Kubernetes vermerkt, während bei Docker Compose kein Restart aufgeführt ist.
+Dadurch wirkt die k3s-Umgebung auf den ersten Blick unzuverlässiger. Dabei handelt es sich jedoch nicht um ein Problem mit der Zuverlässigkeit, sondern um ein Performanceproblem, genauer gesagt um den massiven Ressourcenverbrauch der Check-API.
+Zwar ist es logisch, dass die Check-API durch den von ihr betriebenen Compiler mehr Ressourcen benötigt, für einen erhöhten Nutzen der Check-API werden jedoch fast vier CPU-Kerne benötigt.
+Dies ist das Maximum, das die VMs aus der Docker-Compose- und der k3s-Umgebung haben. Deshalb versucht die Check-API, alle Ressourcen für sich zu beanspruchen.
+In der Docker-Compose-Umgebung fällt dies jedoch nicht auf, da RAM und CPU dort nach dem Best-Effort-Prinzip verteilt werden und ein Service somit mehr Ressourcen beanspruchen kann, als fair ist.
+Bei Kubernetes hat allerdings jeder Pod einen Request, also einen Mindestbedarf an Ressourcen, aber auch ein Limit für den CPU- und RAM-Verbrauch. 
+Daher können die Services die Ressourcen nicht frei nutzen.
+Aufgrund dieser Limitierung kann die Check-API nicht mehr auf die benötigten Ressourcen zugreifen. Dadurch wird sie langsamer und muss häufiger neu gestartet werden, je mehr sie genutzt wird.
+Dies kann durch mehrere Ergebnisse bewiesen werden. Erstens haben beide Umgebungen im Login-Szenario, in dem die Check-API nicht genutzt wird, ein besseres Scoring.
+Zweitens ist das Scoring der k3s-Umgebung in Tests, bei denen mehr virtuelle User verwendet werden, schlechter, da die Check-API häufiger genutzt werden muss. Die Docker-Compose-Umgebung kann dies besser verwalten.
+Dabei versteckt die Docker-Compose-Umgebung die Performance-Probleme eher, während die k3s-Umgebung diese messbarer und sichtbarer macht.
+Dadurch wird die Anwendung instabiler, da die Check-API die Ressourcen in der Docker-Compose-Umgebung für sich beansprucht. In der k3s-Umgebung läuft die Check-API zwar schlechter, kann aber die restlichen Services nicht beeinflussen.
+Dies spricht eher für eine bessere Zuverlässigkeit der k3s-Umgebung, da die Anwendung insgesamt stabiler ist und sich die einzelnen Services weniger stark beeinflussen können.
+
+Die Testergebnisse zeigen, dass die Unterschiede zwischen der Docker-Compose- und der k3s-Umgebung durch die Chaos-Tests deutlicher sichtbar sind als durch die Loadtests.
+Das deutet darauf hin, dass die k3s-Umgebung toleranter gegenüber Ausfällen ist als die Docker-Compose-Umgebung, da bereits ein Teilausfall eines Dienstes bedeutet, dass der Dienst komplett ausgefallen ist, während die k3s-Umgebung noch erreichbar ist.
+Die Wiederherstellungszeit in der Tabelle \ref{tab:chaos_api_instance_down} bei k3s ist wahrscheinlich eher auf den Timer der Testumgebung als auf eine Downtime des Services zurückzuführen.
+Dieses Verhalten wurde dadurch verschärft, dass auch aus den Ergebnissen zu entnehmen ist, dass die Docker-Compose-Umgebung trotz festgelegter Restart-Regeln nicht in der Lage war, sich selbst wiederherzustellen.
+Das passierte dadurch, dass der Container bei einem Absturz in einen Restart-Loop gerät.
+Das wird durch einen persistenten RUNNING\_PID-Zustand verursacht, weswegen der Container beim Hochfahren glaubt, dass dieser Service schon betrieben wird. Dadurch entscheidet er, dass es diesen Service nicht doppelt geben darf, beendet sich wieder und die Restart-Policy greift erneut.
+Dieser Fehler tritt anscheinend nicht bei einem kontrollierten Herunterfahren des Containers auf, was durch die Ergebnisse des Update-Tests gezeigt wird. 
+
+Dort wird durch das Webhook-Skript die gesamte Docker-Compose-Umgebung heruntergefahren und anschließend neu gestartet. Durch diese Deployment-Verwaltung hat die Docker-Compose-Umgebung auch eine Downtime beim Deployment.
+Durch dieses Webhook-Deployment fallen auch direkt alle Services aus, selbst wenn diese eigentlich kein Update haben. Dadurch könnte ein Update der AI-API auch die Haupt-API kurzzeitig down bringen.
+Bei kleineren Deployments, bei denen nichts Neues erstellt wird, ist das eher eine geringe Auswirkung, wie in der Tabelle \ref{tab:chaos_api_update} zu sehen ist. Bei größeren Deployments kann das aber auch länger dauern.
+Zusätzlich ist beim Erstellen der Update-Tests ein Bug aufgefallen, wodurch das Webhook-Skript, das zum Deployment genutzt wird, die Anwendungen von der VM entfernen kann.
+Das passiert, weil das Skript nach dem Klonen des Projekts auf die VM den alten Projektstand blind löscht, auch wenn beim Klonen ein Fehler aufgetreten ist, wodurch der neue Projektzustand nicht auf der VM vorhanden ist.
+Die Volumes sind davon nicht betroffen, aber alles andere, das sich im Ordner „teamprojekt” befindet, darunter das Docker Compose, das Webhook-Skript selbst und auch die TLS-Zertifikate.
+
+Dies ist jedoch eher ein Problem der Deployment-Verwaltung durch den Webhook als durch Docker Compose selbst. Aber auch wenn die Services einzeln aktualisiert werden, gäbe es eine Downtime.
+In der k3s-Umgebung wird das Rolling Update angewendet, wodurch, wie in Tabelle \ref{tab:chaos_api_update} zu sehen ist, eine Zero-Downtime erreicht wird. Das passiert, da die Pods nach und nach ersetzt werden, anstatt dass der gesamte Service heruntergefahren wird.
+Durch die Deployment-Verwaltung mit FluxCD übernimmt die k3s-Umgebung das Deployment selbst, wodurch dieser Fehler mit dem Webhook nicht auftreten kann.
+

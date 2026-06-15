@@ -1,0 +1,62 @@
+\chapter{Fazit}
+
+Codetask wird in einem Docker Compose betrieben. Da diese Anwendung für Vorlesungen und Klausuren genutzt werden soll, ist eine zuverlässige Umgebung erforderlich.
+Daher soll Codetask in eine Kubernetes-Umgebung migriert und anschließend mithilfe von Tests untersucht werden, ob sich die Zuverlässigkeit verbessert hat.
+Codetask sollte dabei verfügbar bleiben, eine höhere Fehlertoleranz aufweisen, stabiler funktionieren und bei Ausfällen eine schnellere Wiederherstellbarkeit gewährleisten.
+
+Zu den einzelnen Services von Codetask wurden aus den Docker-Compose-Dateien Helm-Charts erstellt.
+Um diese Helm-Charts auch lokal auszuprobieren, wurde anschließend ein Autoskript erstellt, das einen lokalen Kubernetes-Cluster auf dem eigenen Rechner einrichtet, auf dem Codetask betrieben wird.
+Um Codetask in einer produktionsnahen Umgebung zu betreiben, wurde ein k3s-Cluster in das Hochschulnetzwerk integriert. 
+Dabei wurde der Cluster als HA-Architektur entworfen, um den Cluster selbst zuverlässiger zu gestalten.
+Um Codetask in den k3s-Cluster zu deployen, wurde ein GitOps angelegt, der den Clusterzustand von Codetask verwaltet.
+Dabei wurden weitere Komponenten integriert, um Codetask zuverlässiger zu gestalten. Dazu gehören Load Balancing von Anwendungs-Traffic, Verwaltung von persistenter Speicherung und automatische Skalierung von Pods.
+Abschließend wurden Last- und Chaos-Tests auf der Docker-Compose- und k3s-Umgebung durchgeführt.
+Aus den Testdaten wurde die Zuverlässigkeit ausgewertet und beide Umgebungen miteinander verglichen.
+
+Die öffentlich erreichbare Codetask-Instanz wird weiterhin in Docker Compose betrieben. Die im Cluster betriebene Codetask-Instanz ist intern und über VPN erreichbar.
+Bei den Loadtests waren die Unterschiede zwischen den beiden Systemen eher begrenzt. 
+Die Ergebnisse wurden dabei teilweise durch Performance-Probleme der Anwendung beeinflusst, insbesondere durch die Check-API, die einen hohen Ressourcenverbrauch verursacht.
+Die Docker-Compose-Umgebung erlaubt diesen hohen Ressourcenverbrauch, wodurch die Fehlerrate geringer ausfiel.
+Kubernetes begrenzt den Ressourcenverbrauch und verhindert so, dass andere Services beeinflusst werden.
+Daher war das gesamte System unter Kubernetes stabiler, auch wenn einzelne Messdaten eher schlechter ausfielen.
+
+Die größeren Vorteile von Kubernetes gegenüber Docker Compose sind bei Chaos-Tests sichtbar.
+Die Kubernetes-Umgebung schafft es besser und schneller, die Services wiederherzustellen. 
+Ausfälle kann Kubernetes auch besser verkraften. Denn auch wenn ein Node-Ausfall im Hochschulnetzwerk eher unrealistisch ist, bedeutet ein Ausfall eines Service bei Docker Compose immer einen Komplettausfall. 
+Bei Kubernetes kann ein Service dagegen auf die verschiedensten Arten ausfallen. So kann beispielsweise ein Container ausfallen, ohne dass der Service komplett unzugänglich wird. Es kann auch sein, dass der Großteil des Services ausfällt und nur noch ein Container vorhanden ist.
+Durch das Self-Healing von Kubernetes wird sogar reagiert, wenn ein Container, auch wenn er nicht ausgefallen ist, Anfragen nicht mehr richtig bearbeiten kann.
+Beim Docker Compose hat ein Service auch einen kurzzeitigen Ausfall, wenn ein Update durchgeführt wird, während bei Kubernetes durch Rolling Updates jeder Pod nach und nach ausgewechselt wird, sodass eine Zero Downtime gewährleistet ist.
+
+Bei den Untersuchungen stellte sich jedoch auch heraus, dass die Zuverlässigkeit nicht nur durch die Orchestratorumgebung, sondern auch durch die Deployment- und Betriebsprozesse beeinflusst wird.
+Der GitOps-Ansatz bietet dabei eine höhere Betriebssicherheit, da Deployment-Abläufe nicht auf externen Anwendungen und fehleranfälligen skriptbasierten Deployments aufbauen müssen.
+
+Die Untersuchungen basieren natürlich nur auf dem Entwicklungszustand von Codetask. Codetask hat außerdem eigene Performance-Probleme.
+Darüber hinaus enthält Codetask weitere Fehler, die sich im Laufe der Zeit eingeschlichen haben. 
+Ein Beispiel ist der gefundene Bug im Webhook-Skript, das das Deployment ausführt.
+Durch diesen Bug kann es passieren, dass beim Klonen des aktuellen Projektzustands ein Fehler auftritt und das Webhook-Skript die gesamte Anwendung von der VM entfernt.
+Dadurch kann es auch sein, dass Docker Compose besser abschneidet, wenn es keine versteckten Fehler enthält oder anders eingerichtet ist.
+
+Ein Nachteil von Kubernetes im Vergleich zu Docker Compose ist der Ressourcenverbrauch der Umgebung selbst.
+Während Docker Compose nur auf einer VM laufen muss, braucht ein Kubernetes-Cluster für sein volles Potenzial mehrere.
+Damit eine Anwendung durch Kubernetes stabiler und verfügbarer bleibt, werden auch mehr Ressourcen benötigt, wodurch ein Kubernetes-Overhead entsteht.
+Daher ist Docker Compose besser geeignet, wenn eine Anwendung nur auf einem Gerät betrieben werden soll. Daher lohnt sich Docker Compose mehr wenn nur ein Server zuverfügung steht oder für die Entwicklung, wenn Entwickelnde ihren Code lokal testen wollen.
+
+Kubernetes ist auch komplexer als Docker Compose, da durch die verschiedensten zusätzlichen Einstellungen und die Verwaltung nicht nur die Anwendung, sondern auch der Cluster selbst verwaltet werden muss.
+Außerdem haben die meisten Studierenden, die an diesem Projekt arbeiten werden, mehr Erfahrung mit Docker Compose, da die meisten wahrscheinlich noch nie mit Kubernetes gearbeitet haben.
+
+Der Wechsel zu Kubernetes würde sich für Codetask langfristig lohnen. 
+Da auf Codetask Klausuren ausgeführt werden sollen, muss es eine hohe Verfügbarkeit und Fehlertoleranz aufweisen. So wird sichergestellt, dass das Prüfungsergebnis ausschließlich durch die Leistung des Prüflings beeinflusst wird und nicht durch die Anwendung, auf der die Prüfung stattfindet.
+Zudem ist geplant, Codetask in Zukunft zu exportieren, sodass auch weitere Kurse als nur der Programmiertechnik-1-Kurs Codetask verwenden, Codetask an weiteren Hochschulen angeboten und auch Nicht-Studierenden als Scala-Lernplattform zur Verfügung gestellt wird. 
+Codetask wird somit ein wachsendes Nutzeraufkommen haben. Dabei muss die Anwendung stabil bleiben und die Last muss verteilt werden. 
+Die Kubernetes-Umgebung kann hochskaliert werden, um mit Codetask mitzuwachsen.
+
+Wenn entschieden wird, dass die Kubernetes-Umgebung die Docker-Compose-Umgebung ersetzen soll, kann der Cluster in ein öffentlich zugängliches Netz umziehen, das ohne VPN zugänglich ist.
+Alternativ kann der Cluster auch vollständig im VPN isoliert bleiben. In diesem Fall muss der externe Zugriff über eine Edge-VM erfolgen, die als DMZ-Reverse-Proxy verwendet wird.
+Nach dem vollständigen Ersatz können die Staging- und die aktuelle Produktionsumgebung abgeschaltet werden.
+
+Da die Ergebnisse dieser Arbeit auf kontrollierten Testdurchläufen basieren, kann die Kubernetes-Umgebung auch in einer zukünftigen Untersuchung schrittweise in den realen Betrieb eingeführt werden.
+Dabei kann ein kleiner Teil der Nutzer die Kubernetes-Umgebung nutzen, während der Großteil der Nutzer weiterhin die Docker-Compose-Umgebung benutzt.
+Dadurch kann über einen längeren Zeitraum hinweg das Betriebsverhalten durch echte Nutzerbetreibung beobachtet und die Verfügbarkeit, Fehlertoleranz, Stabilität und Wiederherstellbarkeit getestet werden.
+
+Der Cluster kann mit weiteren Konzepten erweitert werden, wodurch sich die Zuverlässigkeit erhöhen lässt.
+Ansonsten kann die Performance optimiert werden, um die Zuverlässigkeit von Codetask zu verbessern.

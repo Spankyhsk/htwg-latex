@@ -1,0 +1,9 @@
+\subsection{Ergebnisse der Umsetzung}
+Durch die Umsetzung haben die Studierenden einen lokalen Cluster, in dem sie ihre Implementierungen in einer produktionsechten Umgebung ausprobieren können.
+Die Automation der Cluster-Einrichtung bringt nicht nur den Vorteil, dass die Studierenden den Cluster leicht auf ihren Geräten einrichten können, ohne Kubernetes-Kenntnisse zu benötigen, sondern der Cluster muss dadurch auch nur temporär auf diesen Geräten vorhanden sein, wenn er gerade benötigt wird. 
+Dadurch können die Studierenden beim Entwickeln den Cluster mit nur einem Befehl starten, ihre Implementierungen testen und nach Abschluss der Arbeit diesen wieder mit einem Cleanup-Befehl entfernen, bis sie den lokalen Cluster wieder benötigen.
+
+Durch die Ressourcenverwaltung können nun Pods besser auf den Nodes verteilt werden, zusätzlich wird auch verhindert das ein Service alle Ressourcen für sich selbst beanspruchen kann.
+Zusammen mit den Probes und den RollingUpdates erzielt das Codetask bei einem Update eine Zero Downtime.
+
+Durch den Ingress sind nun drei Services nach außen erreichbar mit http, während die anderen Services nur im Cluster selbst erreichbar bleiben.

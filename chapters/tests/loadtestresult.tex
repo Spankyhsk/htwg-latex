@@ -1,0 +1,14 @@
+\subsection{Loadtest}
+Bei den Loadtests werden nur die Ergebnisse der Szenarien unter "Average Load" im Einzelnen vorgestellt.
+Dabei werden auch die wichtigsten Messwerte zur Bestimmung der Zuverlässigkeit aggregiert aus allen Testdurchführungen angezeigt.
+„CPU Max” und „Memory Max” zeigen, wie viel die Anwendung maximal an RAM und CPU während der Tests verbraucht hat.
+„Node CPU MAX” und „Node Memory MAX” zeigen, wie viel das gesamte System maximal an RAM und CPU verbraucht hat. Bei Docker Compose wäre dies eine VM, während es bei k3s der gesamte Cluster wäre.
+Beide Werte sind jeweils normiert, um die Umgebungen fairer vergleichen zu können.
+Die Error Rate zeigt, wie viele HTTP-Anfragen fehlgeschlagen sind.
+Es wird auch angezeigt, wie viele Restarts von Containern in Docker Compose und wie viele Pods in der K3s-Umgebung in allen Testdurchläufen zusammengezählt wurden.
+
+Bei jedem Szenario wird auch die Auswertung für jeden Testdurchlauf angezeigt, der mit „Average Load” lief, sowie das aggregierte Scoring aller Testumgebungen.
+Zum Schluss jedes Szenarios wird die durchschnittliche Zuverlässigkeit jeder Testmethode angezeigt.
+\input{chapters/tests/login.tex}
+\input{chapters/tests/vorlesungen.tex}
+\input{chapters/tests/klausur.tex}

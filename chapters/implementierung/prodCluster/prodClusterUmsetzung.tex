@@ -1,0 +1,29 @@
+\subsection{Umsetzung / Konfiguration}
+Für die Einrichtung des Clusters im Hochschulnetzwerk hat die IT sechs VMs mit dem Betriebssystem Ubuntu bereitgestellt.
+Auf einer der VMs wird der Load Balancer (LB) für die Verteilung der Anfragen zu den Master Nodes eingerichtet. Auf drei weiteren VMs werden die Master Nodes und auf den letzten beiden VMs die Worker Nodes eingerichtet.
+
+Zunächst musste der Load Balancer eingerichtet werden. Dafür wurde auf der VM codetask-kub-lb HAProxy, ein Open-Source-TCP-LB, mit dem Befehl „sudo apt-get install haproxy” installiert.
+Anschließend wurde die haproxy.cfg so erweitert, dass festgelegt wurde, über welchen Port der LB die Anfragen annimmt und wie er die Anfragen an die Master Nodes weiterleitet, um die Last zu verteilen.
+Als Master Nodes wurden die IP-Adressen von codetask-kub-1 bis codetask-kub-3 angegeben.
+Die Verteilung der Anfragen erfolgt über Round Robin, um die Last zu verteilen.
+
+Nachdem der LB eingerichtet wurde, wird der Cluster gebootstrappt. Dazu wurde auf der VM codetask-kub-1 der folgende Befehl als HA Bootstrap gesetzt.
+\begin{lstlisting}[language=bash, caption={K3s Installation mit HAProxy TLS-SAN}]
+curl -sfL https://get.k3s.io | \
+INSTALL_K3S_EXEC="server --cluster-init --tls-san <HAPROXY-IP>" sh -
+\end{lstlisting}
+Die Flag „--cluster-init” initialisiert den k3s-Cluster, während die Flag „--tls-san” den Zugriff über HAProxy ermöglicht.
+
+Nach dem Bootstrap des Clusters nehmen wir den Token aus codetask-kub-1, um die VMs codetask-kub-2 und codetask-kub-3 als weitere Master-Nodes in den Cluster zu joinen.
+Dafür wurde im folgenden Befehl, der auf beiden VMs ausgeführt wurde, dieser Token mitgegeben. Außerdem wurde angegeben, über welchen Server die VM den Cluster joinen muss. In diesem Fall ist es der HAProxy.
+\begin{lstlisting}[language=bash, caption={Master Nodes joinen mit HAProxy TLS-SAN}]
+curl -sfL https://get.k3s.io | \ 
+INSTALL_K3S_EXEC="server --server https://<HAPROXY-IP>:443 --tls-san <HAPROXY-IP>" K3S_TOKEN=<TOKEN> sh -
+\end{lstlisting}
+
+Zum Schluss mussten die VMs „codetask-kub-4” und „codetask-kub-5” nur noch als Worker Nodes dem Cluster beitreten. Anders als bei Master Nodes muss dafür aber nicht explizit die Rolle angegeben werden.
+Der Zugriff über den LB muss auch nicht erlaubt werden, da auf die Worker Nodes nur über die Master Nodes zugegriffen wird.
+\begin{lstlisting}[language=bash, caption={Worker Nodes joinen}]
+curl -sfL https://get.k3s.io | \
+K3S_URL=https://<HAPROXY-IP>:443 K3S_TOKEN=<TOKEN> sh -
+\end{lstlisting}

@@ -1,0 +1,15 @@
+\subsection{Staging und Production Umgebung}
+
+Die Docker-Compose-Dateien sind im Unterordner /.deployment zu finden.
+In der Produktionsumgebung läuft die aktuelle Live-Version von Codetask, während die Staging-Umgebung einen Zwischenstand zwischen der lokalen und der Produktionsumgebung darstellt.
+In dieser können Implementierungen und Entwicklungen in einer live-ähnlichen Umgebung getestet werden.
+
+Die Compose-Dateien ähneln denen der lokalen Umgebung, haben dennoch deutliche Unterschiede.
+So gibt es beispielsweise einen weiteren Service namens Traefik, der als Reverse Proxy benutzt wird. 
+Die Umgebungen haben auch einen Eintrag des DNS-Servers der HTWG, wodurch sie auch von außen erreichbar sind. Die Staging-Umgebung ist hingegen nur über VPN erreichbar.
+Der Host der Prod-Umgebung ist codetask.in.htwg-konstanz.de, der Host der Staging-Umgebung ist staging-codetask.in.htwg-konstanz.de. Wird der Host für die API oder AI-API verwendet, wird jeweils das Passende vorne dran gehängt, z. B. „api.codetask.in.htwg-konstanz.de”.
+Daher haben beide Umgebungen jeweils drei URLs, wodurch drei Services von außen erreichbar sind. Die restlichen Services sind nur intern im Compose-Netzwerk erreichbar.
+Bei der Produktionsumgebung haben alle drei URLs ein TLS-Zertifikat erhalten, wodurch jede mit HTTPS genutzt werden kann. Bei der Staging-Umgebung hat nur die URL für das Webframework ein TLS-Zertifikat erhalten.
+
+Anders als bei der lokalen Umgebung werden die Images bei beiden Compose nicht mehr mit Dockerfiles selbst gebaut, sondern über die Container Registry vom GitLab-Repository von Codetask geholt.
+Die Staging- und Produktionsumgebung haben auch ein anderes Dockerfile als die lokale Umgebung. Ein Unterschied ist beispielsweise, dass die Container nicht im DEV-Modus laufen oder dass im Frontend-Dockerfile ein Container für das Webframework und den Webserver enthalten ist.

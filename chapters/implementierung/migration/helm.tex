@@ -1,0 +1,28 @@
+\subsubsection{Helm}
+
+Helm ist ein Paketmanager speziell für Kubernetes-Objekte, der sich aber auch als Templating-Tool verwenden lässt.
+Damit hilft Helm, Kubernetes-Cluster besser zu verwalten, da ein Service einer Anwendung, wie z. B. die Haupt-API, aus mehreren Manifesten besteht und dadurch zentral verwaltet werden kann.
+Die Manifeste des Services enthalten Platzhalter, für die die richtigen Werte in einer values.yaml-Datei stehen. Ein Paket von Manifesten wird bei Helm auch „Chart” genannt.
+Ein Chart besitzt dabei auch immer eine values.yaml-Datei, die die Standardwerte für den Service enthält. Diese Datei kann überschrieben werden, wenn bestimmte Werte in bestimmten Umgebungen anders sein sollen.
+Es werden nicht mehr die einzelnen Manifeste in den Kubernetes-Cluster geladen, sondern der gesamte Helm-Chart mit values. Ist ein Helm-Chart in einem Cluster, wird es als Helm-Release bezeichnet. 
+
+Da Helm ein Paketmanager ist, müssen nicht alle Services, die in einen Cluster sollen, selbst angelegt werden, sondern es können auch vorgefertigte aus dem Internet von anderen Repos verwendet werden. 
+Die eigenen Helm-Charts müssen nicht im Projekt-Repository liegen, sondern können auch in einem eigenen Repository abgelegt werden, wodurch sie auch von anderen Projekten verwendet werden können. Die Projekte müssen lediglich die passende Überschreibung im Repo für das Deployment besitzen.
+\begin{figure}[htbp]
+
+\dirtree{%
+.1 frontend/.
+.2 templates/.
+.3 frontend-deployment.yaml.
+.3 frontend-ingress.yaml.
+.3 frontend-nginx-config.yaml.
+.3 frontend-service.yaml.
+.2 Chart.yaml.
+.2 values.yaml.
+}
+
+\caption{Frontend Helm Chart Struktur}
+\label{fig:helmstruktur}
+
+\end{figure}
+\FloatBarrier

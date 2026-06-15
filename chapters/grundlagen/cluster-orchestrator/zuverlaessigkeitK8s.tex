@@ -1,0 +1,22 @@
+\subsection{Zuverlässigkeit durch Kubernetes}
+
+Kubernetes bietet durch seine Technik einige Features, die genutzt werden können, um die Zuverlässigkeit zu erhöhen.
+
+Dies beginnt damit, dass Kubernetes mehrere Replikate von Pods hat, wodurch sich die Verfügbarkeit verbessert. Selbst wenn ein Pod eines Services ausfällt, z. B. eines Backends, ist dieser dennoch verfügbar, da der Traffic auf die Replikate umgeleitet wird.
+Dies kann durch die Eigenschaft von Kubernetes als Cluster-Container-Orchestrator gesteigert werden, da die Anwendungen auf mehreren Nodes laufen. Deshalb bleibt die Anwendung auch bei einem Node-Ausfall bestehen, während bei einem Single-Host-Container-Orchestrator die gesamte Anwendung down wäre.
+Dies kann bei Kubernetes auch verknüpft werden, indem im Deployment eingestellt wird, dass sich die Replicas von Pods desselben Services auf verschiedene Nodes verteilen. Dadurch bleibt der Service auch bei einem Node-Ausfall erreichbar.
+Dabei punktet Kubernetes auch beim Aspekt der Fehlertoleranz, da es erkennt, wenn ein Pod ausfällt – egal aus welchem Grund – und den Traffic auf die noch existierenden Replicas dieses Pods umleitet.
+
+Kubernetes verfolgt das Desired-State-Prinzip, weshalb es bei einem Pod-Ausfall direkt versucht, den Pod wiederherzustellen, damit die Anzahl der Replicas dieses Pods gleich bleibt, wie es im Deployment angegeben ist.
+Bei einem Ausfall eines ganzen Nodes versucht Kubernetes, die Pods auf einem anderen Node wiederherzustellen. Sobald ein neuer Node im System hinzugefügt wird oder der alte Node wiederhergestellt wurde, kann Kubernetes diese Pods erneut verteilen.
+
+All dies gehört auch zum Self-Healing von Kubernetes und kann die Zuverlässigkeit von Anwendungen weiter verbessern.
+Kubernetes überwacht die Gesundheit der Pods durch Probes. Dadurch kann erkannt werden, ob der Container im Pod noch richtig läuft. Falls nicht, würde Kubernetes den Pod als ungesund markieren und den Traffic auf die anderen Pods dieses Services umleiten.
+Zusätzlich versucht Kubernetes, den Container im Pod oder sogar den ganzen Pod neu zu starten.  Dadurch können Fehler im System vermieden und der richtige Betrieb wiederhergestellt werden.
+
+Das Desired-State-Prinzip muss in Kubernetes aber nicht fest sein, sondern kann auch automatisch nach Last skaliert werden, und zwar durch den Horizontal Pod Autoscaler. 
+Dieser kann die Anzahl der Replicas eines Pods erhöhen und auf eine angegebene maximale und minimale Anzahl beschränken, je nachdem, wie viel Last ein Service verbraucht.
+Dies verstärkt die Stabilität im System, da die Ressourcen angemessen verteilt werden.
+
+Kubernetes erhöht auch die Zuverlässigkeit durch Rolling Updates. Bei einem Rolling Update wird ein Pod nach dem anderen ausgetauscht, während das Update läuft. Dadurch können Ausfälle während einer Aktualisierung vermieden werden.
+Dies kann durch die Probes, die im Self-Healing verwendet werden, verbessert werden, indem zuerst geprüft wird, ob der Pod gesund ist, bevor er für den Traffic freigegeben wird.

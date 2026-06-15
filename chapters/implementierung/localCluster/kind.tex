@@ -1,0 +1,6 @@
+\subsubsection{kind}
+
+Kind ist ein Tool, mit dem sich ein Kubernetes-Cluster lokal auf dem Rechner über Docker simulieren lässt.
+Was Kind dabei anders macht als andere Tools, die dasselbe tun, z. B. das weitverbreitete Minikube, ist, dass Kind nicht selbst in Docker läuft, sondern jeder Node in diesem Cluster einen eigenen Container hat.
+Dadurch verbraucht Kind viel weniger RAM, was mit meinem Ziel zusammenpasst, dass der lokale Cluster auf jedem Rechner eines Studierenden nutzbar ist.
+Meiner persönlichen Meinung nach ist es auch besser, einen Cluster zu simulieren, bei dem jeder Node auf einem anderen Server existiert, da jeder Node in einem eigenen Container isolierter ist.

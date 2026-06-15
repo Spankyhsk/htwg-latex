@@ -1,0 +1,5 @@
+\subsubsection{Traefik}
+
+Um ein Ingress zunutzen braucht ein Kubernetes Cluster zunächst ein Ingress Controller der als Loadbalancer für den Ingress verwendet wird.
+Ich habe aus zwei Gründen mich für Traefik entschieden. Der erste Grund ist das der nginx Ingress Controller im März 2026 von Kubernetes stillgelegt wurde \parencite{kubernetes_ingress_nginx_retirement_2025}.
+Der andere Grund ist das Traefik schon in den Compose Datein von der Staging und Production Umgebung als Reverse Proxy genutzt wurde.

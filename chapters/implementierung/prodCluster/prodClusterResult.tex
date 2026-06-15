@@ -1,0 +1,13 @@
+\subsection{Ergebnisse der Umsetzung}
+Durch die Umsetzung gibt es ein k3s-Cluster mit HA-Architektur für die Produktionsumgebung im Hochschulnetzwerk. 
+Da die Anwendung im Hochschulnetzwerk bleibt, müssen die VMs nicht über Tools wie OpenTofu und Proxmox selbst verwaltet werden, sondern weiterhin von der IT.
+Der Cluster kann per SSH auf einen Master-Node zugegriffen werden. Es gibt aber auch die Möglichkeit, einen Admin-Rechner einzurichten. Dieser kann über den LB auf den Cluster zugreifen. 
+Das ist praktisch, wenn es benötigt wird, bei einen größeren Betrieb.
+
+Diese Ergebnisse steigern die Zuverlässigkeit. 
+Dank der HA-Architektur hat die Anwendung nicht nur eine höhere Verfügbarkeit, sondern auch eine bessere Fehlertoleranz. So können nicht nur Ausfälle von Worker Nodes, sondern auch von Master Nodes toleriert werden.
+Durch den Load Balancer und die mehreren Master- und Worker-Nodes steigt auch die Stabilität der Anwendung, da diese ihre Last nun besser verteilen kann.
+
+Hinzu kommt, dass dieses System skalierbar ist. Wenn bei einen größeren Betriebsverhalten mehr Last erzeugt wird, können weitere Master- und Worker-Nodes zum Cluster hinzugefügt werden, um diese besser zuverteilen.
+Auch der LB kann Replicas bekommen bei einen Wachstum der Nodes. Daher kann der Cluster mit Codetask zusammen wachsen.
+

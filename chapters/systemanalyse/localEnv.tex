@@ -1,0 +1,13 @@
+\subsection{Lokale Umgebung}
+
+Die Docker-Compose.yml-Datei für die lokale Umgebung liegt im Root-Verzeichnis des Projekts.
+Sie dient dazu, dass Codetask lokal ausgeführt werden kann, um daran zu entwickeln und Veränderungen auszuprobieren, bevor diese gepusht werden.
+Daher sind alle Services unter localhost erreichbar, bekommen aber vom Compose jeweils eigene Ports zugeordnet. Es werden keine weiteren Netzwerkeinstellungen eingerichtet.
+
+Das Compose der lokalen Umgebung baut die Images mit den selbst erstellten Dockerfiles selbst und nimmt dabei das Root-Verzeichnis als Kontext.
+Die Anwendungen in den Containern werden jeweils im DEV-Modus gestartet, wodurch das Webframework beispielsweise einen eigenen Webserver hat. Dadurch verbrauchen alle Container jedoch mehr Ressourcen als im Normalbetrieb.
+Die Images von nginx, mongodb und mongo-express werden aus dem Internet gezogen. 
+
+Alle Services haben die Option „restart: unless-stopped” hinzugefügt bekommen, wodurch Container, wenn sie ausfallen, direkt neu gestartet werden.
+
+Die Services haben ein Env-File zugeordnet bekommen, aber manche haben direkt eigene Environment-Variablen im Compose. Das Besondere an der lokalen Umgebung ist, dass die Volumes der Konfiguration der Services im Container überschrieben werden, wodurch die Konfiguration außerhalb des Containers angepasst werden kann, während dieser läuft, und nach einem Neustart verwendet werden kann.

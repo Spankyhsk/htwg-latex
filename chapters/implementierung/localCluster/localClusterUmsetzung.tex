@@ -1,0 +1,37 @@
+\subsection{Umsetzung / Konfiguration}
+
+Kind kann einfach mit einem Install-Tool wie Chocolate heruntergeladen werden.
+Um Kind mit mehreren Nodes laufen zu lassen, wurde eine Kind-Konfiguration erstellt, die beim Starten eines Kind-Clusters mitgegeben wird.
+Der lokale Cluster hat einen Master-Node und zwei Worker-Nodes. 
+Diese Aufteilung dient nur dazu, die Nutzung mehrerer Nodes zu simulieren und zu verhindern, dass die gesamte Last in einem Docker-Container liegt. 
+
+Sobald der Cluster hochgefahren ist, müssen die Helm-Charts in den Cluster geladen werden. 
+Danach werden die Images der eigenen Services in ein In-Cluster-Registry geladen. Anschließend wird ein Rollout der Deployments ausgeführt, damit die Pods die neuen Container wahrnehmen.
+
+Damit die Studierenden den Cluster nicht selbst auf ihren lokalen Geräten einrichten müssen, wurde ein Automatisierungsskript entworfen. Für Windows ist dieses Skript in PowerShell geschrieben, während es für macOS und Linux in Shell geschrieben ist.
+Das Automation-Script richtet den Kind-Cluster auf dem lokalen Gerät ein, lädt die Helm-Charts in den Cluster und erstellt daraufhin die Images, die in das In-Cluster-Registry gepusht werden. Zum Schluss führt es ein Rollout aus, damit die Deployments die Pods mit den Containern neu starten. 
+
+Durch den lokalen Cluster konnten die eigenen Helm-Charts zunächst ausprobiert und angepasst werden.
+Da im lokalen Cluster nur die Helm-Charts und der Code ausprobiert werden müssen und der Cluster nur eine kurze lebig ist, gibt es von jedem Service nur einen Pod.
+Das hat auch weiterhin den Nutzen, dass auf den lokalen Geräten der Studierenden, die sich mit diesem Projekt befassen, weniger Ressourcen benötigt werden.
+
+Die erste Anpassung, die der lokale Cluster an den Helm-Charts vorgenommen hat, war das Hinzufügen des Ressourcenmanagements.
+In Kubernetes kann für die Pods angegeben werden, wie viel Ressourcen mindestens reserviert werden können und wie viel ein Pod maximal haben darf. 
+Zu diesen Ressourcen gehören die benötigte RAM- und CPU-Kapazität. Dadurch kann Kubernetes die Pods besser verwalten, da nun bekannt ist, wie viel Ressourcen ein Pod mindestens braucht, es aber auch ein Limit gibt, damit kein Pod die Ressourcen anderer abziehen kann.
+Um zu entscheiden, wie viel RAM und CPU jeder Pod bekommt, wurde ein Monitoring eingesetzt.
+
+Die weitere Anpassung, die vorgenommen wurde, ist, dass Probes für jeden Helm-Chart hinzugefügt werden.
+Dabei wurde für jeden Helm-Chart eine StartupProbe und eine ReadinessProbe eingerichtet. 
+Eine StartupProbe prüft, ob der Container im Pod hochgefahren ist und die Anwendung gestartet wurde. Solange die StartupProbe nicht bestanden wurde, werden die anderen Probes blockiert.
+Wenn eine StartupProbe zu oft fehlschlägt, wird der gesamte Pod neu gestartet.
+Eine ReadinessProbe prüft, ob der Container Requests bearbeiten kann, d. h., ob die Anwendung selbst läuft und externe Services noch erreichbar sind, ohne die die komplette Anwendung nicht funktioniert.
+Wird eine ReadinessProbe nicht bestanden, wird der Pod auf „NotReady” gesetzt. Dadurch wird der Traffic auf die anderen Pods umgeleitet, bis die ReadinessProbe wieder bestanden wird oder der Pod neu gestartet wird.
+
+Dabei schickt Kubernetes die Probes als Request an die Pods selbst.
+Beim Frontend muss nur dem Webserver ein einfacher Request geschickt werden, der mit einem 200-Statuscode beantwortet werden muss.
+Bei der Haupt-API, der Check-API und der AI-API mussten eigene Healthcheck-Endpunkte implementiert werden. Diese antworten mit einem 200, wenn sie erreicht werden.
+Die MongoDB wird über TCP-Sockets angefragt.
+
+Damit die Service-Frontends, die Haupt-API und die AI-API von außen erreichbar sind, musste für jedes dieser Helm-Charts ein Ingress erstellt werden. 
+Da geplant ist, Traefik als Ingress-Controller zu nutzen, wird dessen Helm-Chart auch schon in den lokalen Cluster geladen, um näher an der Produktionsumgebung zu bleiben.
+Da die Nodes in Docker-Containern sind, musste über die kind config ein externPortMapping eingerichtet werden, damit die Ingress-Ports von außen über localhost erreichbar sind.
